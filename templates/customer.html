@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Banking Simulator</title>
+    <style>
+        :root {
+            --bg: #eef6f3;
+            --bg-strong: #d8e9e3;
+            --panel: rgba(255, 255, 255, 0.88);
+            --ink: #16322d;
+            --muted: #56716a;
+            --line: rgba(22, 50, 45, 0.12);
+            --brand: #0f8b6d;
+            --brand-deep: #0a5c48;
+            --accent: #c7792f;
+            --danger: #a83c32;
+            --danger-soft: rgba(168, 60, 50, 0.12);
+            --success: #166b51;
+            --success-soft: rgba(22, 107, 81, 0.12);
+            --warning: #9a6610;
+            --warning-soft: rgba(154, 102, 16, 0.14);
+            --shadow: 0 26px 70px rgba(16, 48, 40, 0.12);
+            --radius: 26px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            padding: 28px;
+            font-family: Georgia, 'Times New Roman', serif;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at top left, rgba(15, 139, 109, 0.20), transparent 26%),
+                radial-gradient(circle at bottom right, rgba(199, 121, 47, 0.18), transparent 22%),
+                linear-gradient(160deg, var(--bg) 0%, #f7fbf9 45%, var(--bg-strong) 100%);
+        }
+
+        .shell {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            gap: 22px;
+        }
+
+        .hero {
+            display: grid;
+            gap: 18px;
+            padding: 28px;
+            border-radius: 32px;
+            background: linear-gradient(135deg, rgba(10, 92, 72, 0.98), rgba(15, 139, 109, 0.92));
+            color: #f7fbf9;
+            box-shadow: var(--shadow);
+        }
+
+        .hero-top {
+            display: flex;
+            justify-content: space-between;
+            gap: 18px;
+            flex-wrap: wrap;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            padding: 6px 12px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #dcf5ec;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-size: 12px;
+        }
+
+        h1 {
+            margin-top: 12px;
+            font-size: clamp(2.2rem, 4vw, 4rem);
+            line-height: 0.95;
+            max-width: 760px;
+        }
+
+        .hero-copy {
+            max-width: 760px;
+            color: rgba(247, 251, 249, 0.84);
+            line-height: 1.6;
+            font-size: 15px;
+        }
+
+        .hero-link {
+            color: #fff3df;
+            text-decoration: none;
+            font-size: 13px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .hero-metrics,
+        .workspace,
+        .support-grid {
+            display: grid;
+            gap: 18px;
+        }
+
+        .hero-metrics {
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        }
+
+        .workspace {
+            grid-template-columns: 0.95fr 1.05fr;
+        }
+
+        .support-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .metric,
+        .panel {
+            border-radius: var(--radius);
+            background: var(--panel);
+            border: 1px solid var(--line);
+            box-shadow: var(--shadow);
+        }
+
+        .metric {
+            padding: 18px;
+        }
+
+        .metric-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: rgba(247, 251, 249, 0.7);
+        }
+
+        .metric-value {
+            margin-top: 8px;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .panel {
+            padding: 22px;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: flex-start;
+            margin-bottom: 18px;
+        }
+
+        .panel-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .panel-subtitle {
+            margin-top: 4px;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .form-grid {
+            display: grid;
+            gap: 14px;
+        }
+
+        .field-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .form-group {
+            display: grid;
+            gap: 6px;
+        }
+
+        .customer-tools {
+            display: grid;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .customer-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .customer-grid {
+            display: grid;
+            gap: 10px;
+            max-height: 210px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .customer-card {
+            display: grid;
+            gap: 4px;
+            width: 100%;
+            text-align: left;
+            border-radius: 16px;
+            border: 1px solid rgba(15, 139, 109, 0.18);
+            background: rgba(15, 139, 109, 0.08);
+            color: var(--ink);
+            padding: 12px 14px;
+            cursor: pointer;
+            transition: transform 120ms ease, box-shadow 120ms ease, border-color 120ms ease;
+        }
+
+        .customer-card:hover {
+            transform: translateY(-1px);
+            border-color: rgba(15, 139, 109, 0.4);
+            box-shadow: 0 10px 20px rgba(16, 48, 40, 0.08);
+        }
+
+        .customer-card.active {
+            border-color: rgba(10, 92, 72, 0.95);
+            background: linear-gradient(135deg, rgba(15, 139, 109, 0.2), rgba(10, 92, 72, 0.14));
+        }
+
+        .customer-card-name {
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        .customer-card-meta {
+            font-size: 12px;
+            color: var(--muted);
+            line-height: 1.4;
+        }
+
+        label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--muted);
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 15px;
+            border: 1px solid var(--line);
+            background: rgba(255, 255, 255, 0.82);
+            color: var(--ink);
+            font: inherit;
+        }
+
+        textarea {
+            min-height: 90px;
+            resize: vertical;
+        }
+
+        input[readonly] {
+            background: rgba(15, 139, 109, 0.08);
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            border: none;
+            border-radius: 999px;
+            padding: 13px 18px;
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--brand), #15a37f);
+            color: #f8fcfa;
+        }
+
+        .btn-secondary {
+            background: rgba(22, 50, 45, 0.08);
+            color: var(--ink);
+        }
+
+        .alert {
+            display: none;
+            padding: 14px 16px;
+            border-radius: 18px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .alert-success {
+            background: var(--success-soft);
+            color: var(--success);
+            border: 1px solid rgba(22, 107, 81, 0.18);
+        }
+
+        .alert-error {
+            background: var(--danger-soft);
+            color: var(--danger);
+            border: 1px solid rgba(168, 60, 50, 0.18);
+        }
+
+        .card-stack,
+        .history-list,
+        .factor-list {
+            display: grid;
+            gap: 12px;
+        }
+
+        .mini-card {
+            padding: 16px;
+            border-radius: 18px;
+            background: rgba(15, 139, 109, 0.06);
+            border: 1px solid rgba(15, 139, 109, 0.10);
+        }
+
+        .mini-label {
+            font-size: 11px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .mini-value {
+            margin-top: 6px;
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .result-panel {
+            display: grid;
+            gap: 12px;
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .result-row:last-child {
+            border-bottom: none;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 5px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .badge-low,
+        .badge-approve {
+            background: var(--success-soft);
+            color: var(--success);
+        }
+
+        .badge-medium,
+        .badge-review {
+            background: var(--warning-soft);
+            color: var(--warning);
+        }
+
+        .badge-high,
+        .badge-block {
+            background: var(--danger-soft);
+            color: var(--danger);
+        }
+
+        .empty-state {
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 1100px) {
+            .workspace,
+            .support-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 720px) {
+            body {
+                padding: 16px;
+            }
+
+            .hero,
+            .panel {
+                border-radius: 22px;
+                padding: 18px;
+            }
+
+            .field-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="shell">
+        <section class="hero">
+            <div class="hero-top">
+                <div>
+                    <span class="eyebrow">Customer banking simulator</span>
+                    <h1>Send demo transfers through the real fraud engine.</h1>
+                    <p class="hero-copy">This customer-side app lets you create a demo bank user, resolve a fake beneficiary name for any 10-digit account number, and send transfers into the same fraud scoring system used by the analyst dashboard.</p>
+                </div>
+                <a class="hero-link" href="/">Open Analyst Dashboard</a>
+            </div>
+            <div class="hero-metrics">
+                <div class="metric">
+                    <div class="metric-label">Connected Customer</div>
+                    <div class="metric-value" id="heroCustomerName">Not connected</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">Stored User ID</div>
+                    <div class="metric-value" id="heroCustomerId">None</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">Latest Decision</div>
+                    <div class="metric-value" id="heroLatestDecision">Waiting</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="workspace">
+            <article class="panel">
+                <div class="panel-header">
+                    <div>
+                        <div class="panel-title">Create Demo Customer</div>
+                        <div class="panel-subtitle">Register a simulated bank customer once, then reuse that customer for transfers on this device.</div>
+                    </div>
+                </div>
+                <form id="customerRegisterForm" class="form-grid">
+                    <div class="customer-tools">
+                        <label for="customerSearch">Select Existing Customer</label>
+                        <input id="customerSearch" type="text" placeholder="Search by username, user id, city or country">
+                        <div class="customer-actions">
+                            <button class="btn-secondary" type="button" id="refreshCustomersButton">Refresh List</button>
+                        </div>
+                        <div id="customerPickerCards" class="customer-grid">
+                            <div class="empty-state">No customers loaded yet.</div>
+                        </div>
+                    </div>
+                    <div class="field-grid">
+                        <div class="form-group">
+                            <label for="customerUsername">Username</label>
+                            <input id="customerUsername" name="username" type="text" placeholder="bank_customer_01" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="customerEmail">Email</label>
+                            <input id="customerEmail" name="email" type="email" placeholder="customer@example.com" required>
+                        </div>
+                    </div>
+                    <div class="field-grid">
+                        <div class="form-group">
+                            <label for="customerPhone">Phone Number</label>
+                            <input id="customerPhone" name="phone_number" type="text" placeholder="+2348012345678" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="customerAge">Age</label>
+                            <input id="customerAge" name="cardholder_age" type="number" min="18" max="100" placeholder="32">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="customerAddress">Address</label>
+                        <input id="customerAddress" name="address" type="text" placeholder="12 Allen Avenue, Ikeja, Lagos" required>
+                    </div>
+                    <div class="btn-row">
+                        <button class="btn-primary" type="submit">Create Customer</button>
+                        <button class="btn-secondary" type="button" id="clearCustomerButton">Clear This Device</button>
+                    </div>
+                    <div id="customerRegisterAlert" class="alert"></div>
+                </form>
+            </article>
+
+            <article class="panel">
+                <div class="panel-header">
+                    <div>
+                        <div class="panel-title">Transfer Money</div>
+                        <div class="panel-subtitle">Enter any 10-digit beneficiary account. The app generates a fake account holder name, then sends the transfer through the fraud model.</div>
+                    </div>
+                </div>
+                <form id="transferForm" class="form-grid">
+                    <div class="field-grid">
+                        <div class="form-group">
+                            <label for="recipientAccountNumber">Recipient Account Number</label>
+                            <input id="recipientAccountNumber" name="recipient_account_number" type="text" maxlength="10" placeholder="0123456789" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="beneficiaryName">Beneficiary Name</label>
+                            <input id="beneficiaryName" type="text" value="Waiting for valid account number" readonly>
+                        </div>
+                    </div>
+                    <div class="field-grid">
+                        <div class="form-group">
+                            <label for="beneficiaryBank">Beneficiary Bank</label>
+                            <input id="beneficiaryBank" type="text" value="Auto generated" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="transferAmount">Amount (NGN)</label>
+                            <input id="transferAmount" name="amount" type="number" min="1" step="0.01" placeholder="5000" required>
+                        </div>
+                    </div>
+                    <div class="panel-subtitle" id="locationStatus">Location: Detecting browser position for current transaction...</div>
+                    <div class="btn-row">
+                        <button class="btn-secondary" type="button" id="refreshLocationButton">Use My Current Location</button>
+                    </div>
+                    <div class="form-group">
+                        <label for="transferNarration">Narration</label>
+                        <textarea id="transferNarration" name="narration" placeholder="Rent, school fees, groceries, emergency support"></textarea>
+                    </div>
+                    <button class="btn-primary" type="submit">Send Demo Transfer</button>
+                    <div id="transferAlert" class="alert"></div>
+                </form>
+            </article>
+        </section>
+
+        <section class="support-grid">
+            <article class="panel">
+                <div class="panel-header">
+                    <div>
+                        <div class="panel-title">My Demo Profile</div>
+                        <div class="panel-subtitle">The customer profile stored on this browser for repeat transfers.</div>
+                    </div>
+                </div>
+                <div id="customerProfile" class="card-stack">
+                    <div class="empty-state">Create a customer profile to start using the banking simulator.</div>
+                </div>
+            </article>
+
+            <article class="panel">
+                <div class="panel-header">
+                    <div>
+                        <div class="panel-title">Latest Fraud Decision</div>
+                        <div class="panel-subtitle">Each transfer is scored by the same backend fraud engine used by the analyst dashboard.</div>
+                    </div>
+                </div>
+                <div id="transferResult" class="result-panel">
+                    <div class="empty-state">Send a transfer to see approval, review, or block decisions here.</div>
+                </div>
+            </article>
+        </section>
+
+        <section class="support-grid">
+            <article class="panel">
+                <div class="panel-header">
+                    <div>
+                        <div class="panel-title">Why Was It Flagged?</div>
+                        <div class="panel-subtitle">Risk factors returned directly from the fraud scoring response.</div>
+                    </div>
+                </div>
+                <div id="riskFactors" class="factor-list">
+                    <div class="empty-state">No transfer has been scored yet.</div>
+                </div>
+            </article>
+
+            <article class="panel">
+                <div class="panel-header">
+                    <div>
+                        <div class="panel-title">Recent Demo Transfers</div>
+                        <div class="panel-subtitle">Latest transfers for the currently connected simulated customer.</div>
+                    </div>
+                </div>
+                <div id="transferHistory" class="history-list">
+                    <div class="empty-state">No transfer history yet.</div>
+                </div>
+            </article>
+        </section>
+    </main>
+
+    <script>
+        const apiBase = '/api';
+        const CUSTOMER_STORAGE_KEY = 'demoBankCustomer';
+        const DEVICE_STORAGE_KEY = 'demoBankDeviceFingerprint';
+
+        const state = {
+            customer: null,
+            beneficiary: null,
+            latestTransfer: null,
+            availableCustomers: [],
+            browserLocation: null,
+        };
+
+        function setAlert(element, message, type) {
+            element.className = `alert show alert-${type}`;
+            element.textContent = message;
+        }
+
+        function clearAlert(element) {
+            element.className = 'alert';
+            element.textContent = '';
+        }
+
+        function currency(value, currencyCode = 'NGN') {
+            const numeric = Number(value || 0);
+            try {
+                return new Intl.NumberFormat(undefined, {
+                    style: 'currency',
+                    currency: currencyCode || 'NGN',
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                }).format(numeric);
+            } catch (_error) {
+                return `${currencyCode || 'NGN'} ${numeric.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            }
+        }
+
+        function dateTime(value) {
+            return value ? new Date(value).toLocaleString() : 'N/A';
+        }
+
+        async function fetchJson(path, options) {
+            const response = await fetch(`${apiBase}${path}`, options);
+            const data = await response.json().catch(() => ({}));
+            if (!response.ok) {
+                throw new Error(data.error || (data.errors && data.errors.join(', ')) || 'Request failed');
+            }
+            return data;
+        }
+
+        function ensureDeviceFingerprint() {
+            let fingerprint = localStorage.getItem(DEVICE_STORAGE_KEY);
+            if (!fingerprint) {
+                fingerprint = `cust-${Math.random().toString(36).slice(2)}-${Date.now()}`;
+                localStorage.setItem(DEVICE_STORAGE_KEY, fingerprint);
+            }
+            return fingerprint;
+        }
+
+        function saveCustomer(customer) {
+            state.customer = customer;
+            localStorage.setItem(CUSTOMER_STORAGE_KEY, JSON.stringify(customer));
+            renderCustomerProfile();
+        }
+
+        function renderCustomerPickerCards(filter = '') {
+            const container = document.getElementById('customerPickerCards');
+            if (!container) {
+                return;
+            }
+
+            const needle = String(filter || '').trim().toLowerCase();
+            const currentId = state.customer?.user_id;
+            const visible = state.availableCustomers.filter((user) => {
+                if (!needle) {
+                    return true;
+                }
+                const haystack = [
+                    user.username,
+                    user.user_id,
+                    user.registered_city,
+                    user.registered_country,
+                ].join(' ').toLowerCase();
+                return haystack.includes(needle);
+            });
+
+            if (!visible.length) {
+                container.innerHTML = '<div class="empty-state">No matching customers found.</div>';
+                return;
+            }
+
+            container.innerHTML = visible.map((user) => {
+                const active = currentId && user.user_id === currentId ? 'active' : '';
+                const location = [user.registered_city, user.registered_country].filter(Boolean).join(', ') || 'Unknown location';
+                return `
+                    <button class="customer-card ${active}" type="button" data-user-id="${user.user_id}">
+                        <span class="customer-card-name">${user.username}</span>
+                        <span class="customer-card-meta">ID: ${user.user_id}</span>
+                        <span class="customer-card-meta">${location}</span>
+                    </button>
+                `;
+            }).join('');
+        }
+
+        async function loadCustomerOptions() {
+            const result = await fetchJson('/customer/users');
+            state.availableCustomers = result.users || [];
+            const searchValue = document.getElementById('customerSearch')?.value || '';
+            renderCustomerPickerCards(searchValue);
+        }
+
+        async function connectCustomerById(userId) {
+            if (!userId) {
+                throw new Error('Select a customer first.');
+            }
+            const profile = await fetchJson(`/customer/users/${userId}`);
+            saveCustomer(profile.user);
+            const history = await fetchJson(`/customer/users/${userId}/transactions`);
+            renderTransferHistory(history.transactions || []);
+            const searchValue = document.getElementById('customerSearch')?.value || '';
+            renderCustomerPickerCards(searchValue);
+        }
+
+        async function detectBrowserLocation() {
+            const status = document.getElementById('locationStatus');
+            if (!navigator.geolocation) {
+                state.browserLocation = null;
+                status.textContent = 'Location: Browser geolocation not supported. Backend will use IP/profile fallback.';
+                return;
+            }
+
+            status.textContent = 'Location: Requesting browser geolocation permission...';
+            await new Promise((resolve) => {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        state.browserLocation = {
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude,
+                        };
+                        status.textContent = 'Location: Using your live browser GPS coordinates for this transaction.';
+                        resolve();
+                    },
+                    () => {
+                        state.browserLocation = null;
+                        status.textContent = 'Location: Permission denied or unavailable. Live transfer is blocked until location access is granted.';
+                        resolve();
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 8000,
+                        maximumAge: 120000,
+                    }
+                );
+            });
+        }
+
+        function clearCustomer() {
+            state.customer = null;
+            state.latestTransfer = null;
+            localStorage.removeItem(CUSTOMER_STORAGE_KEY);
+            document.getElementById('customerProfile').innerHTML = '<div class="empty-state">Create a customer profile to start using the banking simulator.</div>';
+            document.getElementById('transferHistory').innerHTML = '<div class="empty-state">No transfer history yet.</div>';
+            document.getElementById('transferResult').innerHTML = '<div class="empty-state">Send a transfer to see approval, review, or block decisions here.</div>';
+            document.getElementById('riskFactors').innerHTML = '<div class="empty-state">No transfer has been scored yet.</div>';
+            document.getElementById('heroCustomerName').textContent = 'Not connected';
+            document.getElementById('heroCustomerId').textContent = 'None';
+            document.getElementById('heroLatestDecision').textContent = 'Waiting';
+        }
+
+        function renderCustomerProfile() {
+            const container = document.getElementById('customerProfile');
+            if (!state.customer) {
+                container.innerHTML = '<div class="empty-state">Create a customer profile to start using the banking simulator.</div>';
+                return;
+            }
+
+            document.getElementById('heroCustomerName').textContent = state.customer.username || 'Connected';
+            document.getElementById('heroCustomerId').textContent = state.customer.user_id || 'Stored';
+            container.innerHTML = `
+                <div class="mini-card">
+                    <div class="mini-label">Customer Name</div>
+                    <div class="mini-value">${state.customer.username}</div>
+                </div>
+                <div class="mini-card">
+                    <div class="mini-label">User ID</div>
+                    <div class="mini-value">${state.customer.user_id}</div>
+                </div>
+                <div class="mini-card">
+                    <div class="mini-label">Registered City</div>
+                    <div class="mini-value">${state.customer.registered_city || 'Unavailable'}</div>
+                </div>
+                <div class="mini-card">
+                    <div class="mini-label">Total Transfers Seen</div>
+                    <div class="mini-value">${state.customer.total_transactions || 0}</div>
+                </div>
+            `;
+        }
+
+        function renderTransferResult(result) {
+            const container = document.getElementById('transferResult');
+            state.latestTransfer = result;
+            document.getElementById('heroLatestDecision').textContent = result.decision;
+            container.innerHTML = `
+                <div class="result-row"><span>Decision</span><span class="badge badge-${String(result.decision || '').toLowerCase()}">${result.decision}</span></div>
+                <div class="result-row"><span>Risk Level</span><span class="badge badge-${String(result.risk_level || '').toLowerCase()}">${result.risk_level}</span></div>
+                <div class="result-row"><span>Fraud Probability</span><strong>${(Number(result.fraud_probability || 0) * 100).toFixed(2)}%</strong></div>
+                <div class="result-row"><span>Amount</span><strong>${currency(document.getElementById('transferAmount').value)}</strong></div>
+                <div class="result-row"><span>Transaction City</span><strong>${result.transaction_city || 'Unknown'}</strong></div>
+                <div class="result-row"><span>Transaction State</span><strong>${result.transaction_state || 'Unknown'}</strong></div>
+                <div class="result-row"><span>Country</span><strong>${result.transaction_country || 'Unknown'}</strong></div>
+                <div class="result-row"><span>Location Source</span><strong>${result.location_source || 'default'}</strong></div>
+                <div class="result-row"><span>Coordinates Source</span><strong>${result.coordinates_source || 'default'}</strong></div>
+                <div class="result-row"><span>Beneficiary</span><strong>${result.recipient.account_name}</strong></div>
+                <div class="result-row"><span>Bank</span><strong>${result.recipient.bank_name}</strong></div>
+                <div class="result-row"><span>Processing Time</span><strong>${Number(result.processing_time_ms || 0).toFixed(2)} ms</strong></div>
+            `;
+
+            const factors = result.risk_factors || [];
+            document.getElementById('riskFactors').innerHTML = factors.length
+                ? factors.map((factor) => `<div class="mini-card">${factor}</div>`).join('')
+                : '<div class="empty-state">No explicit risk factors returned for this transfer.</div>';
+        }
+
+        function renderTransferHistory(transactions) {
+            const container = document.getElementById('transferHistory');
+            if (!transactions || !transactions.length) {
+                container.innerHTML = '<div class="empty-state">No transfer history yet.</div>';
+                return;
+            }
+
+            container.innerHTML = transactions.map((transaction) => `
+                <div class="mini-card">
+                    <div class="mini-label">${transaction.transaction_id}</div>
+                    <div class="mini-value">${transaction.merchant_name}</div>
+                    <div class="panel-subtitle">${currency(transaction.amount, transaction.currency || 'NGN')} | ${transaction.status} | ${dateTime(transaction.timestamp)}</div>
+                </div>
+            `).join('');
+        }
+
+        async function loadStoredCustomer() {
+            const raw = localStorage.getItem(CUSTOMER_STORAGE_KEY);
+            if (!raw) {
+                clearCustomer();
+                return;
+            }
+
+            try {
+                const storedCustomer = JSON.parse(raw);
+                const profile = await fetchJson(`/customer/users/${storedCustomer.user_id}`);
+                saveCustomer(profile.user);
+                const history = await fetchJson(`/customer/users/${storedCustomer.user_id}/transactions`);
+                renderTransferHistory(history.transactions || []);
+                const searchValue = document.getElementById('customerSearch')?.value || '';
+                renderCustomerPickerCards(searchValue);
+            } catch (_error) {
+                clearCustomer();
+            }
+        }
+
+        async function lookupBeneficiary(accountNumber) {
+            const beneficiaryName = document.getElementById('beneficiaryName');
+            const beneficiaryBank = document.getElementById('beneficiaryBank');
+            if (!/^\d{10}$/.test(accountNumber)) {
+                state.beneficiary = null;
+                beneficiaryName.value = 'Waiting for valid account number';
+                beneficiaryBank.value = 'Auto generated';
+                return;
+            }
+
+            try {
+                const result = await fetchJson(`/customer/account-lookup?account_number=${accountNumber}`);
+                state.beneficiary = result;
+                beneficiaryName.value = result.account_name;
+                beneficiaryBank.value = result.bank_name;
+            } catch (_error) {
+                state.beneficiary = null;
+                beneficiaryName.value = 'Could not resolve account';
+                beneficiaryBank.value = 'Unavailable';
+            }
+        }
+
+        document.getElementById('customerRegisterForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const payload = Object.fromEntries(new FormData(event.target).entries());
+            const alertBox = document.getElementById('customerRegisterAlert');
+            clearAlert(alertBox);
+
+            try {
+                const result = await fetchJson('/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                });
+                saveCustomer({
+                    user_id: result.user_id,
+                    username: result.user.username,
+                    registered_city: result.user.registered_city,
+                    registered_country: result.user.registered_country,
+                    total_transactions: result.user.total_transactions || 0,
+                });
+                renderTransferHistory([]);
+                await loadCustomerOptions();
+                setAlert(alertBox, `Customer created. Your demo user id is ${result.user_id}.`, 'success');
+                event.target.reset();
+            } catch (error) {
+                setAlert(alertBox, error.message, 'error');
+            }
+        });
+
+        document.getElementById('refreshCustomersButton').addEventListener('click', async () => {
+            const alertBox = document.getElementById('customerRegisterAlert');
+            clearAlert(alertBox);
+            try {
+                await loadCustomerOptions();
+                setAlert(alertBox, 'Customer list refreshed.', 'success');
+            } catch (error) {
+                setAlert(alertBox, error.message, 'error');
+            }
+        });
+
+        document.getElementById('customerSearch').addEventListener('input', (event) => {
+            renderCustomerPickerCards(event.target.value || '');
+        });
+
+        document.getElementById('customerPickerCards').addEventListener('click', async (event) => {
+            const button = event.target.closest('.customer-card');
+            if (!button) {
+                return;
+            }
+            const alertBox = document.getElementById('customerRegisterAlert');
+            clearAlert(alertBox);
+            try {
+                const selectedUserId = button.getAttribute('data-user-id');
+                await connectCustomerById(selectedUserId);
+                setAlert(alertBox, 'Customer connected for transfers.', 'success');
+            } catch (error) {
+                setAlert(alertBox, error.message, 'error');
+            }
+        });
+
+        document.getElementById('clearCustomerButton').addEventListener('click', () => {
+            clearCustomer();
+        });
+
+        document.getElementById('recipientAccountNumber').addEventListener('input', async (event) => {
+            await lookupBeneficiary(event.target.value.replace(/\D/g, ''));
+        });
+
+        document.getElementById('refreshLocationButton').addEventListener('click', async () => {
+            await detectBrowserLocation();
+        });
+
+        document.getElementById('transferForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const alertBox = document.getElementById('transferAlert');
+            clearAlert(alertBox);
+
+            if (!state.customer) {
+                setAlert(alertBox, 'Create a customer profile first.', 'error');
+                return;
+            }
+
+            if (state.browserLocation?.latitude == null || state.browserLocation?.longitude == null) {
+                setAlert(alertBox, 'Live current location is required. Click "Use My Current Location" and allow location access.', 'error');
+                return;
+            }
+
+            const formData = Object.fromEntries(new FormData(event.target).entries());
+            const payload = {
+                user_id: state.customer.user_id,
+                recipient_account_number: formData.recipient_account_number,
+                amount: formData.amount,
+                narration: formData.narration,
+                device_fingerprint: ensureDeviceFingerprint(),
+            };
+
+            if (state.browserLocation?.latitude != null && state.browserLocation?.longitude != null) {
+                payload.latitude = state.browserLocation.latitude;
+                payload.longitude = state.browserLocation.longitude;
+                payload.geolocation_source = 'browser';
+            }
+
+            try {
+                const result = await fetchJson('/customer/transfer', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                });
+                renderTransferResult(result);
+                const history = await fetchJson(`/customer/users/${state.customer.user_id}/transactions`);
+                renderTransferHistory(history.transactions || []);
+                const profile = await fetchJson(`/customer/users/${state.customer.user_id}`);
+                saveCustomer(profile.user);
+                setAlert(alertBox, `Transfer processed with decision ${result.decision}.`, 'success');
+            } catch (error) {
+                setAlert(alertBox, error.message, 'error');
+            }
+        });
+
+        detectBrowserLocation().catch(() => {});
+        loadCustomerOptions().catch(() => {});
+        loadStoredCustomer();
+        ensureDeviceFingerprint();
+    </script>
+</body>
+</html>

@@ -1,0 +1,189 @@
+
+
+CHAPTER THREE: SYSTEM ANALYSIS AND DESIGN
+
+3.1 Research Design
+This study adopts a quantitative machine learning approach combined with a systematic literature review to develop an intelligent real-time fraud detection system for financial transactions. While numerous studies have proposed advanced AI and machine learning frameworks for fraud detection, many existing models still face challenges such as limited adaptability to evolving fraud patterns, high computational demands, difficulties in real-time deployment, and insufficient interpretability for end users. These limitations create a gap in achieving a system that is both highly accurate and practically deployable in dynamic financial environments.
+The research design focuses on addressing these gaps by developing a model that can:
+Adapt dynamically to new transaction behaviors,
+Operate efficiently in real-time, and
+Provide interpretable results to enhance user trust and decision-making.
+By focusing on these aspects, the study aims to surpass the constraints of previous works, ensuring a robust, scalable, and practical fraud detection system suitable for modern fintech applications.
+
+
+
+3.1 Data Collection
+The dataset for this study was obtained from Scopus, a reputable and comprehensive bibliographic database, ensuring access to high-quality, peer-reviewed articles related to financial transactions and fraud detection. Data collection involved systematically retrieving relevant publications on machine learning and AI applications in fintech fraud detection, focusing on studies that reported transactional datasets, features, and performance metrics.
+To ensure reliability and relevance, the search was conducted using keywords such as “fraud detection,” “financial transactions,” “machine learning,” “UPI fraud,” and “digital payments”. Only articles published in the last five years were included to capture recent trends and technological advancements. Duplicate entries, irrelevant studies, and articles lacking sufficient data were excluded. This process resulted in a curated dataset that forms the basis for the model development and analysis.
+
+3.1.1 Research Methodology
+The methodology follows four phases with comprehensive execution strategies: Data Collection and Preparation phase involves acquiring publicly available fraud detection datasets from Kaggle, specifically the Credit Card Fraud Detection dataset containing 284,807 transactions with 492 fraudulent cases representing 0.17% fraud rate. This phase performs exploratory data analysis to understand transaction patterns, amount distributions, and temporal trends. The severe class imbalance where fraudulent transactions represent less than 1% of total transactions necessitates special handling to prevent model bias toward predicting all transactions as legitimate. SMOTE (Synthetic Minority Over-sampling Technique) addresses this by generating synthetic fraudulent examples through interpolation between existing fraud cases, increasing fraud rate in training set to approximately 20%.
+Model Development and Training phase focuses on implementing and comparing multiple machine learning algorithms including Random Forest and XGBoost, followed by comprehensive evaluation using accuracy, precision, recall, F1-score, and ROC-AUC metrics. The phase involves feature engineering, model hyperparameter optimization, cross-validation, and performance comparison. Random Forest uses 100 estimators with maximum depth of 10, while XGBoost uses 100 boosting rounds with learning rate of 0.1 and early stopping. Both models employ 5-fold cross-validation during training to ensure robust performance estimates.
+System Implementation phase encompasses building the complete fraud detection API using Flask framework, developing feature engineering pipeline to extract predictive features from transaction data, creating web-based dashboard for fraud analysts, and integrating MinIO object storage for model versioning and report management. This phase includes database schema design, API endpoint development, user interface creation, and integration testing.
+Deployment and Testing phase covers containerization using Docker for consistent deployment environments, comprehensive testing including unit, integration, and performance testing, and deployment on Oracle Cloud Free Tier infrastructure for production-like environment testing. The phase ensures the system meets performance requirements and can scale to handle real-world transaction volumes.
+3.1.2 Proposed Model Diagram
+Fraud detection model employs supervised ML algorithms trained on historical data to identify fraudulent transaction patterns. Architecture prioritizes accuracy and explainability for analyst understanding.
+
+Figure 3.1: Fraud Detection Model Architecture
+
+
+3.1.3 Functional and Non-Functional Requirements
+Comprehensive analysis identifies functional capabilities and quality attributes for effective fraud detection, categorized into functional and non-functional requirements.
+
+
+3.2.1 Functional Requirements
+FR1: User Registration Management - The system shall provide API endpoint for registering new users with complete profile information including user identification, email address, phone number, and full postal address. The registration process must validate all input fields for completeness and format correctness. The system must automatically geocode the provided address to extract geographical coordinates (latitude and longitude) using services like Nominatim or Google Maps Geocoding API. These coordinates are essential for distance-based fraud detection features that identify transactions occurring far from the user's registered location. User profile information is stored persistently in PostgreSQL database in the users table, which also captures registration metadata such as IP address and user agent for additional security context.
+FR2: Real-Time Transaction Processing - The system shall accept transaction data through RESTful API endpoints, supporting JSON format with comprehensive transaction details including transaction identifier, user identifier, amount, currency, merchant information, timestamp, IP address, device fingerprint, and user agent string. The API must validate all input data for completeness, type correctness, and logical consistency before processing. Transaction timestamps must be in ISO 8601 format, amounts must be positive numbers, and required fields cannot be null or empty. Invalid requests receive immediate 400 Bad Request error response with descriptive error messages indicating which fields are missing or incorrectly formatted. Valid transactions proceed through the fraud detection pipeline.
+FR3: Intelligent Fraud Detection - The system shall analyze each transaction using trained machine learning models to predict fraud probability within 100 milliseconds to meet real-time requirements for payment processing. The analysis process extracts predictive features from transaction data combined with user profile and historical transaction data, scales features using pre-trained StandardScaler, executes trained ML model (Random Forest or XGBoost) to generate fraud probability score between 0.0 and 1.0, classifies risk level as LOW (0-29%), MEDIUM (30-69%), or HIGH (70-100%), and makes automatic decision to APPROVE, REVIEW, or BLOCK the transaction. The system must maintain consistent decision thresholds across all transactions to ensure predictable behavior. Processing time includes all steps: input validation, database queries, feature extraction, model inference, and response generation.
+FR4: Feature Engineering Pipeline - The system shall automatically extract and calculate predictive features from raw transaction data to enable accurate fraud classification. Transaction features include amount, timestamp-derived features (hour of day, day of week), and merchant category. Location features calculate distance from user's registered address using Haversine formula, detect transactions from different country than registered address, identify impossible travel scenarios where user cannot physically reach transaction location from previous transaction based on time and distance constraints, and detect VPN/proxy usage by checking IP addresses against known anonymization service databases. Behavioral features include transaction frequency in recent time windows (last hour, last 24 hours), amount deviation from user's historical average calculated from approved legitimate transactions, and new device detection by comparing device fingerprint against known devices associated with the user account. All features must be consistently calculated and cached where possible to minimize processing time.
+FR5: Fraud Analyst Dashboard - The system shall provide web-based dashboard accessible by fraud analysts and administrators through secure authentication. Dashboard displays real-time transaction feed showing recent transactions with fraud status indicators, filtered views for flagged transactions requiring review, user-specific transaction history with behavioral analytics, high-amount transaction alerts exceeding configurable threshold, and comprehensive statistics including total transactions processed, fraud detection counts, blocked amounts, and model accuracy metrics. The interface must be responsive and accessible across different devices and browsers. Research by Nair et al. (2025) demonstrates that intuitive interfaces significantly improve analyst productivity and system adoption rates, emphasizing the importance of user-friendly design in fraud detection systems.
+FR6: Comprehensive Logging and Audit Trail - The system shall maintain detailed logs of all transactions, predictions, and system activities for security auditing and system monitoring. Logs include transaction processing details with timestamps, model predictions with confidence scores, risk factors contributing to fraud classification, user actions and system responses, and error messages with contextual information for debugging. All logs must be stored securely and accessible for compliance purposes. The logging system must handle high-volume processing without impacting performance. Log entries include structured data for querying and analysis for system optimization and security investigation.
+
+
+3.2.2 Non-Functional Requirements
+NFR1: Detection Accuracy - Model achieves 95% minimum accuracy, 90% precision, 90% recall, 90% F1-score. Research by Karpaga Selvi et al. (2025) achieved 98% accuracy with Isolation Forest, demonstrating achievability.
+NFR2: Response Time Performance - System completes analysis within 100ms at 95th percentile, supports 100 transactions/second. Feature extraction 20ms, ML inference 50ms, database operations 30ms.
+NFR3: System Reliability - Graceful error handling, retry mechanisms, connection pooling, comprehensive logging. System continues operating during component degradation.
+NFR4: Security and Data Protection - AES-256 encryption at rest, TLS 1.3 network security, JWT/API key authentication, bcrypt password hashing, data protection compliance.
+NFR5: Usability and Accessibility - Intuitive non-technical analyst interface, responsive design, color-coded risk indicators, contextual help, organized information presentation.
+NFR6: Portability and Deployment - Full Docker containerization, docker-compose.yml single-command deployment, Oracle Cloud Free Tier compatibility for academic accessibility.
+
+
+3.3.1 Model Architecture and Algorithm Selection
+System implements Random Forest Classifier and XGBoost Classifier. Random Forest uses 100 decision trees with majority voting, captures non-linear relationships, resists overfitting. XGBoost employs sequential ensemble learning with gradient descent optimization, includes L1/L2 regularization, GPU acceleration, handles sparse data. Research by Bizu and Palanisamy (2025) demonstrated SMOTE ensemble methods achieved 99.88% accuracy, validating this approach.
+Both models trained on identical feature sets, evaluated via cross-validation. Superior ROC-AUC performer selected for production. Model serialized as fraud_model.pkl, scaling parameters saved as scaler.pkl, uploaded to MinIO object storage for version control and Flask API retrieval.
+
+
+3.3.2 Feature Engineering Strategy
+Effective feature engineering transforms raw data into predictive features across five categories: Transaction (amount, timestamp, merchant, category), Location (Haversine distance, country flags, impossible travel), Device (new device flags, fingerprints), Behavioral (frequency, amount deviation), Account (age, transaction count). Features enable sophisticated fraud pattern detection unavailable in isolated transaction examination.
+
+
+3.4 System Architecture
+Three-layer architecture separates data storage, application logic, user interface concerns, enabling independent development while maintaining clear interfaces.
+
+Figure 3.2: Three-Layer System Architecture
+
+
+
+
+3.4.1 Data Layer
+The Data Layer manages all persistent storage using PostgreSQL 14+ as the primary relational database management system and MinIO for object storage. PostgreSQL was selected for its proven reliability in production environments, ACID (Atomicity, Consistency, Isolation, Durability) compliance ensuring data integrity even during system failures, excellent Python integration through psycopg2 library with connection pooling, and robust support for complex queries and transactions. The database schema comprises five main interconnected tables designed to capture all necessary information for fraud detection and analysis.
+Users table stores complete user profiles with fields including user_id (primary key), username, email, phone_number, registered_address, registered_country, registered_city, registered_latitude, registered_longitude (geographical coordinates essential for distance calculations), registration_ip, registration_user_agent, account_creation_date, and total_transactions counter. The geographical coordinates are obtained by geocoding the user's registered address using services like Nominatim or Google Maps Geocoding API during registration, enabling distance-based fraud detection features.
+Transactions table records all processed transactions with fields including transaction_id (primary key), user_id (foreign key to users table), amount, currency, merchant_name, merchant_category, timestamp, latitude, longitude (transaction location from IP geolocation), ip_address, ip_country, ip_city, device_fingerprint, user_agent, prediction (Legitimate or Fraudulent), confidence_score (0.0 to 1.0), risk_level (LOW, MEDIUM, HIGH), and status (APPROVED, BLOCKED, REVIEW). This table accumulates transaction history essential for calculating behavioral features like average amount and transaction frequency patterns.
+Devices table tracks all devices used by each user with fields including device_id (primary key), user_id (foreign key), device_fingerprint (unique device identifier), device_type (mobile, desktop, tablet), browser, operating_system, first_seen timestamp, last_seen timestamp, and total_transactions count. This table enables new device detection, a critical fraud indicator, by maintaining a record of all devices associated with each user account.
+Fraud_predictions table stores detailed prediction results with fields including prediction_id (primary key), transaction_id (foreign key), prediction, confidence_score, risk_factors (JSON field listing which features triggered the alert), and prediction_timestamp. System_logs table maintains audit trail with fields including log_id (primary key), timestamp, log_level (INFO, WARNING, ERROR), and message.
+MinIO provides S3-compatible object storage running as a Docker container alongside PostgreSQL. MinIO stores trained ML model files (fraud_model.pkl, scaler.pkl), generated reports (PDF, CSV formats), database backups (compressed PostgreSQL dumps), and model metadata (JSON files documenting model versions and performance). MinIO enables model versioning (fraud_model_v1.pkl, fraud_model_v2.pkl) allowing easy rollback if new models perform poorly, facilitating continuous improvement and A/B testing of fraud detection models.
+
+
+3.4.2 Application Layer
+Application Layer implements Python Flask 2.3+ business logic, chosen for lightweight design, documentation, ML library integration. Components include: User Registration Service (POST /api/register, validation, geocoding, storage), Fraud Detection Service (POST /api/predict, multi-stage processing: validation, profile lookup, IP geolocation, feature extraction, scaling, ML inference, decision logic, storage, response), Dashboard Data Service (multiple GET endpoints for analyst interface).
+Processing pipeline completes within 100ms, meeting real-time requirements. Research by Abhichandani et al. (2025) demonstrated sub-100ms response times achievable.
+
+
+3.4.3 Presentation Layer
+Presentation Layer provides web dashboard using HTML5/CSS3/JavaScript ES6+, served by Nginx. Features: real-time transaction feed with color-coded status, auto-refresh, filtering controls, statistics panel, fraud alerts, detailed transaction views.
+3.4.4 Containerization and Deployment 
+Figure 3.3: Docker Container Architecture
+Docker containerization enables consistent deployment. Four containers orchestrated by Docker Compose: PostgreSQL (postgres:14, volume persistence), MinIO (minio/minio, S3 compatibility), Flask Backend (custom API image), Nginx Frontend (nginx:alpine). Single 'docker-compose up' deploys entire system. Oracle Cloud Free Tier provides always-free infrastructure for academic deployment.
+3.5 Flowchart, Use Case Diagram, Sequence Diagram, and Other Relevant Diagrams
+Comprehensive diagrams illustrate workflows, component interactions, architectural relationships, clarifying transaction processing from submission to decision.
+
+
+3.5.1 Complete Transaction Processing Flowchart
+
+Figure 3.4: Transaction Processing Flowchart
+Flowchart illustrates complete transaction workflow. Process begins at /api/predict endpoint. Input validation checks required fields and types, returns 400 error for invalid requests. User profile lookup queries PostgreSQL users table, returns 404 if user not found. IP geolocation determines location coordinates. Feature extraction combines current data with user profile and history. StandardScaler normalizes features. ML model generates fraud probability. Risk classification creates LOW/MEDIUM/HIGH levels. Decision logic approves/reviews/blocks transactions. Database storage records complete transaction with prediction results. Response generation returns JSON with decision, risk level, confidence score, processing time, risk factors.
+3.5.2 Use Case Diagram
+
+Figure 3.5: System Use Case Diagram
+
+
+Use case diagram identifies system actors and interactions. External System/Bank represents payment systems integrating fraud detection API, registers users, submits transactions, receives decisions. Fraud Analyst represents security personnel monitoring fraud, views dashboard, filters flagged transactions, searches history, reviews alerts. Administrator represents IT personnel managing system, accesses configuration, monitors health, manages accounts, generates reports, deploys models, reviews logs.
+
+
+3.5.3 Sequence Diagram
+
+Figure 3.6: Transaction Processing Sequence Diagram
+Sequence diagram shows temporal component interactions. Bank System sends HTTP POST to /api/predict. Flask API validates data, queries User Profile Database. Parallel queries retrieve Transaction History and Devices data. IP Geolocation Service returns geographical location. Feature Extraction Module combines data, returns feature vector. ML Model executes prediction, returns probability. Flask API applies decision logic, stores results, returns JSON response. Timing annotations: validation 2ms, queries 20ms, geolocation 15ms, extraction 10ms, prediction 30ms, storage 15ms, response 3ms, totaling 95ms for sub-100ms requirement.
+
+
+
+
+3.5.4 Data Flow Diagram
+
+
+
+Figure 3.7: Data Flow Diagram
+Data flow diagram shows information movement. Bank System sends registration data to Register User process, stores profile, returns confirmation. Bank System sends transaction data to Detect Fraud process, reads user profile and history, performs ML analysis, stores results, returns decision. Fraud Analyst sends dashboard requests to Generate Dashboard Data process, reads transaction and user data, aggregates statistics, returns dashboard data. Detect Fraud process manages MinIO model storage and retrieval for updates without redeployment.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+3.5.5 Entity-Relationship Diagram
+
+Figure 3.8: Database Entity-Relationship Diagram
+ER diagram documents PostgreSQL schema. Users entity with user_id (PK) and profile attributes, has one-to-many relationships with Transactions and Devices entities. Transactions entity with transaction_id (PK) and transaction attributes, has one-to-one relationship with Fraud_Predictions. Devices entity with device_id (PK) and device attributes, unique user_id-device_fingerprint combination. Fraud_Predictions with prediction_id (PK) and prediction attributes. System_Logs with log_id (PK) and log attributes, optional transaction_id reference.
+3.6 Development Tools
+Carefully selected technology stack prioritizes maturity, reliability, documentation quality, ease of deployment. Open-source technologies with active communities ensure viability and learning resources.
+
+
+3.6.1 Programming Languages
+Python 3.9+ primary language for backend and ML implementation, selected for data science ecosystem (Scikit-learn, XGBoost, Pandas, NumPy), readability, Flask integration, psycopg2 database integration. JavaScript ES6+ handles frontend with modern features (arrow functions, promises, async/await) for dashboard interactivity and API communication. HTML5/CSS3 structure dashboard with semantic elements, responsive design, consistent theming. SQL database operations for profile retrieval, history analysis, statistics aggregation, transaction insertion.
+
+
+3.6.2 Machine Learning Libraries and Frameworks
+Scikit-learn 1.0+ provides Random Forest classifier, preprocessing tools (StandardScaler, LabelEncoder), evaluation metrics (accuracy, precision, recall, F1-score, ROC-AUC, confusion matrix), cross-validation, chosen for API consistency, documentation, production implementations. XGBoost 1.7+ implements gradient boosting with XGBClassifier, GPU acceleration, L1/L2 regularization, missing value handling, feature importance, superior tabular performance (Kumar et al., 2025; Abhichandani et al., 2025). Imbalanced-learn addresses class imbalance with SMOTE generating synthetic minority samples, validated by Gupta et al. (2025) achieving 99.95% accuracy. Pandas 1.5+ provides DataFrame for tabular data operations (loading, cleaning, filtering, aggregating, merging). NumPy 1.23+ provides ndarray for numerical array computing, essential for ML feature vectors.
+
+
+3.6.3 Web Development Frameworks and Libraries
+Flask 2.3+ lightweight web framework for REST APIs, features decorator routing, JSON serialization, HTTP method support, middleware, extensive extensions, chosen over Django for minimalist design and API-only suitability. Requests 2.31+ HTTP client for external API communication including IP geolocation, automatic JSON encoding/decoding, session management, error handling. Geopy 2.3+ geocoding services converting addresses to coordinates via Nominatim and Google Maps APIs, essential for distance-based fraud detection.
+
+
+3.6.4 Database and Storage Technologies
+PostgreSQL 14+ primary RDBMS selected for reliability, ACID compliance, performance, complex query support, JSON data type, Python integration. psycopg2 2.9+ PostgreSQL adapter enabling connections, query execution, transaction management, prepared statements, connection pooling. MinIO S3-compatible object storage running in Docker, chosen over AWS S3 for zero cloud costs, API compatibility, easy deployment, web console, stores ML models, scalers, metadata, reports, backups. boto3 1.26+ AWS SDK compatible with MinIO, handles bucket operations, ensures portability between MinIO and AWS S3.
+
+
+3.6.5 Containerization and Deployment Technologies
+Docker 24.0+ provides containerization for consistent deployment across environments, eliminates "works on my machine" problems, enables single-command deployment, easy scaling, process isolation. Docker Compose 2.20+ orchestrates containers via YAML configuration defining services, build contexts, port mappings, environment variables, volumes, dependencies. Single 'docker-compose up' automatically builds images, creates networks, starts containers, displays logs. Nginx (nginx:alpine) serves dashboard with static file serving, reverse proxy to Flask backend, HTTP/2 support, minimized image size for efficient deployment.
+
+
+3.6.6 Development and Testing Tools
+Git 2.40+ distributed version control for code changes, collaboration, history, branches, workflow using feature branches, pull requests, protected main branch. Visual Studio Code IDE with Python, Docker, REST Client, GitLens extensions, integrated terminal. Jupyter Notebook interactive environment for data exploration, visualization, feature engineering prototyping, ML algorithm experimentation. Pytest testing framework with assert syntax, fixtures, parametrized tests, coverage reporting via pytest-cov. Postman API development and testing tool organizing requests, environment variables, and documentation.
+
+
+3.6.7 Achieving Objective 1: Data Collection and Preprocessing
+To achieve the first objective, which involves collecting and preparing data for the fraud detection model, a systematic approach will be used. Transactional datasets will be sourced from Scopus-reviewed literature, focusing on studies that provide features and fraud labels. Data preprocessing will include cleaning missing or inconsistent entries, normalizing numerical features such as transaction amounts, encoding categorical variables like payment method and merchant type, and handling class imbalance using techniques such as SMOTE or ENN.
+The process will leverage Python within Visual Studio Code (VS Code), with libraries such as Pandas for data manipulation and Jupyter Notebook for exploratory analysis. Interactive visualizations and feature engineering will be performed to identify the most relevant predictors of fraudulent activity. Git 2.40+ will be used to version control preprocessing scripts, track changes, and collaborate effectively.
+3.6.8 Achieving Objective 2: Model Development and Evaluation
+The second objective focuses on developing an intelligent, real-time fraud detection system using machine learning. Multiple algorithms, including ensemble methods, deep learning, and hybrid models, will be prototyped and evaluated. Jupyter Notebook will allow iterative experimentation and rapid testing of different model architectures, while Pytest will be used to ensure the correctness of supporting code through unit tests, fixtures, and coverage reporting.Version control via Git and workflow practices such as feature branches, pull requests, and a protected main branch will ensure reproducibility and collaboration across the development team. The model will be trained on the preprocessed dataset, with performance evaluated using metrics such as accuracy, precision, recall, F1-score, and ROC-AUC.
+
+3.6.9 Achieving Objective 3: Integration, API, and Deployment
+The third objective aims to make the developed model operational in a real-time environment. This involves creating APIs to expose the model for transactional scoring, testing them using Postman to ensure correct input and output behavior, and integrating the system within a containerized environment using Docker.This approach allows the fraud detection system to be scalable, reproducible, and easily deployable across different infrastructures. Automated testing and continuous integration will be maintained using Pytest and Git workflow best practices, ensuring that updates to the model or pipeline do not break functionality.
+
+

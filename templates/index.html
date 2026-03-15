@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fraud Detection Dashboard</title>
+    <style>
+        :root {
+            --bg: #f4efe6;
+            --panel: #fffaf2;
+            --panel-strong: #10212b;
+            --ink: #1f2a30;
+            --muted: #68757d;
+            --line: rgba(16, 33, 43, 0.12);
+            --accent: #dd6b20;
+            --accent-soft: rgba(221, 107, 32, 0.14);
+            --success: #1f7a56;
+            --success-soft: rgba(31, 122, 86, 0.14);
+            --warning: #a16207;
+            --warning-soft: rgba(161, 98, 7, 0.16);
+            --danger: #b42318;
+            --danger-soft: rgba(180, 35, 24, 0.14);
+            --shadow: 0 22px 60px rgba(16, 33, 43, 0.08);
+            --radius: 24px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            padding: 24px;
+            font-family: Georgia, 'Times New Roman', serif;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at top left, rgba(221, 107, 32, 0.18), transparent 30%),
+                radial-gradient(circle at bottom right, rgba(16, 33, 43, 0.14), transparent 24%),
+                linear-gradient(160deg, #efe4d2 0%, #f7f2e9 45%, #f4efe6 100%);
+        }
+
+        .shell {
+            max-width: 1480px;
+            margin: 0 auto;
+            display: grid;
+            gap: 22px;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, rgba(16, 33, 43, 0.98), rgba(29, 48, 60, 0.92));
+            color: #f7f2e9;
+            border-radius: 30px;
+            padding: 28px;
+            box-shadow: var(--shadow);
+            display: grid;
+            gap: 20px;
+        }
+
+        .hero-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            padding: 6px 12px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.08);
+            color: #f7d7b5;
+            letter-spacing: 0.08em;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            margin-top: 14px;
+            font-size: clamp(2.1rem, 4vw, 3.8rem);
+            line-height: 0.95;
+            max-width: 720px;
+        }
+
+        .hero-copy {
+            max-width: 760px;
+            color: rgba(247, 242, 233, 0.8);
+            line-height: 1.6;
+            font-size: 15px;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.08);
+            font-size: 13px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #facc15;
+            box-shadow: 0 0 0 6px rgba(250, 204, 21, 0.16);
+        }
+
+        .hero-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 14px;
+        }
+
+        .hero-metric {
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 18px;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .hero-metric-label {
+            font-size: 11px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: rgba(247, 242, 233, 0.62);
+        }
+
+        .hero-metric-value {
+            margin-top: 8px;
+            font-size: 1.7rem;
+            font-weight: 700;
+        }
+
+        .stats-grid,
+        .workspace,
+        .tables-grid,
+        .support-grid {
+            display: grid;
+            gap: 20px;
+        }
+
+        .stats-grid {
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        }
+
+        .workspace {
+            grid-template-columns: 1.1fr 0.9fr;
+        }
+
+        .tables-grid,
+        .support-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .panel {
+            background: var(--panel);
+            border-radius: var(--radius);
+            padding: 22px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(16, 33, 43, 0.06);
+        }
+
+        .panel-dark {
+            background: linear-gradient(160deg, rgba(16, 33, 43, 0.98), rgba(32, 53, 66, 0.94));
+            color: #f7f2e9;
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .panel-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+        }
+
+        .panel-subtitle {
+            margin-top: 4px;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .section-top-gap {
+            margin-top: 18px;
+        }
+
+        .panel-dark .panel-subtitle {
+            color: rgba(247, 242, 233, 0.72);
+        }
+
+        .stat-card {
+            display: grid;
+            gap: 10px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .stat-note {
+            font-size: 13px;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .form-grid {
+            display: grid;
+            gap: 14px;
+        }
+
+        .field-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .form-group {
+            display: grid;
+            gap: 6px;
+        }
+
+        label {
+            font-size: 12px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .panel-dark label {
+            color: rgba(247, 242, 233, 0.7);
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 14px;
+            border: 1px solid var(--line);
+            background: rgba(255, 255, 255, 0.7);
+            font: inherit;
+            color: var(--ink);
+        }
+
+        .panel-dark input,
+        .panel-dark select {
+            background: rgba(255, 255, 255, 0.08);
+            color: #f7f2e9;
+            border-color: rgba(255, 255, 255, 0.12);
+        }
+
+        input::placeholder {
+            color: #8d979c;
+        }
+
+        .panel-dark input::placeholder {
+            color: rgba(247, 242, 233, 0.45);
+        }
+
+        button {
+            border: none;
+            border-radius: 999px;
+            padding: 13px 18px;
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s ease, opacity 0.2s ease;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+            opacity: 0.95;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #dd6b20, #f59e0b);
+            color: #fffaf2;
+        }
+
+        .btn-secondary {
+            background: rgba(16, 33, 43, 0.08);
+            color: var(--ink);
+        }
+
+        .alert {
+            display: none;
+            border-radius: 18px;
+            padding: 14px 16px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .alert-success {
+            background: var(--success-soft);
+            color: var(--success);
+            border: 1px solid rgba(31, 122, 86, 0.2);
+        }
+
+        .alert-error {
+            background: var(--danger-soft);
+            color: var(--danger);
+            border: 1px solid rgba(180, 35, 24, 0.2);
+        }
+
+        .auth-gate {
+            max-width: 520px;
+            margin: 0 auto;
+        }
+
+        .is-hidden {
+            display: none;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            border-radius: 999px;
+            padding: 5px 10px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .risk-low,
+        .decision-approve {
+            background: var(--success-soft);
+            color: var(--success);
+        }
+
+        .risk-medium,
+        .decision-review {
+            background: var(--warning-soft);
+            color: var(--warning);
+        }
+
+        .risk-high,
+        .decision-block {
+            background: var(--danger-soft);
+            color: var(--danger);
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+            border-radius: 18px;
+            border: 1px solid rgba(16, 33, 43, 0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 740px;
+        }
+
+        th,
+        td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid rgba(16, 33, 43, 0.08);
+            font-size: 13px;
+            vertical-align: top;
+        }
+
+        th {
+            background: rgba(16, 33, 43, 0.04);
+            font-size: 11px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        tbody tr:hover {
+            background: rgba(221, 107, 32, 0.04);
+        }
+
+        .empty-state {
+            padding: 22px;
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .list {
+            display: grid;
+            gap: 12px;
+        }
+
+        .list-card {
+            border-radius: 18px;
+            padding: 14px 16px;
+            background: rgba(16, 33, 43, 0.04);
+            border: 1px solid rgba(16, 33, 43, 0.06);
+            display: grid;
+            gap: 6px;
+        }
+
+        .list-card strong {
+            font-size: 14px;
+        }
+
+        .list-meta {
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .result-grid {
+            display: grid;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            font-size: 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 10px;
+        }
+
+        .result-row:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .muted {
+            color: var(--muted);
+        }
+
+        .panel-dark .muted {
+            color: rgba(247, 242, 233, 0.72);
+        }
+
+        .device-box {
+            display: grid;
+            gap: 10px;
+        }
+
+        .device-line {
+            font-size: 14px;
+            line-height: 1.6;
+            word-break: break-word;
+        }
+
+        .footer-note {
+            text-align: center;
+            color: var(--muted);
+            font-size: 12px;
+            padding-bottom: 20px;
+        }
+
+        @media (max-width: 1080px) {
+            .workspace,
+            .tables-grid,
+            .support-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 720px) {
+            body {
+                padding: 16px;
+            }
+
+            .hero,
+            .panel {
+                border-radius: 22px;
+                padding: 18px;
+            }
+
+            .field-grid {
+                grid-template-columns: 1fr;
+            }
+
+            table {
+                min-width: 640px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <section class="auth-gate panel" id="authGate">
+        <div class="panel-header">
+            <div>
+                <div class="panel-title">Analyst Sign In</div>
+                <div class="panel-subtitle">Authenticate with analyst credentials to load review queues, logs, and dashboard data.</div>
+            </div>
+        </div>
+        <form id="authForm" class="form-grid">
+            <div class="form-group">
+                <label for="authUsername">Username</label>
+                <input id="authUsername" name="username" type="text" title="Analyst username" placeholder="analyst" required>
+            </div>
+            <div class="form-group">
+                <label for="authPassword">Password</label>
+                <input id="authPassword" name="password" type="password" title="Analyst password" placeholder="Enter your password" required>
+            </div>
+            <button class="btn-primary" type="submit">Sign In</button>
+            <div id="authAlert" class="alert"></div>
+        </form>
+    </section>
+
+    <main class="shell is-hidden" id="dashboardShell">
+        <section class="hero">
+            <div class="hero-top">
+                <div>
+                    <span class="eyebrow">Fraud analyst workspace</span>
+                    <h1>Real-time scoring tied to user history, location, and device trust.</h1>
+                    <p class="hero-copy">This dashboard now uses PostgreSQL-backed user profiles, geocoded registration data, persistent transaction history, analyst review queues, and structured audit logs instead of the old in-memory demo flow.</p>
+                </div>
+                <div class="status-pill">
+                    <span class="status-dot" id="statusDot"></span>
+                    <span id="statusText">Checking system health</span>
+                </div>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric">
+                    <div class="hero-metric-label">Model Categories</div>
+                    <div class="hero-metric-value" id="categoryCount">0</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-label">Review Queue</div>
+                    <div class="hero-metric-value" id="heroReviewCount">0</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-label">Blocked Amount</div>
+                    <div class="hero-metric-value" id="heroBlockedAmount">$0</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-label">Registered Users</div>
+                    <div class="hero-metric-value" id="heroUserCount">0</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="stats-grid">
+            <article class="panel stat-card">
+                <div class="stat-label">Total Transactions</div>
+                <div class="stat-value" id="totalTransactions">0</div>
+                <div class="stat-note">Persistent count from PostgreSQL transaction history.</div>
+            </article>
+            <article class="panel stat-card">
+                <div class="stat-label">Fraud Count</div>
+                <div class="stat-value" id="fraudCount">0</div>
+                <div class="stat-note">Transactions classified as fraudulent by the model.</div>
+            </article>
+            <article class="panel stat-card">
+                <div class="stat-label">Fraud Rate</div>
+                <div class="stat-value" id="fraudRate">0%</div>
+                <div class="stat-note">Share of scored transactions currently marked fraudulent.</div>
+            </article>
+            <article class="panel stat-card">
+                <div class="stat-label">Average Probability</div>
+                <div class="stat-value" id="averageProbability">0%</div>
+                <div class="stat-note">Mean fraud confidence score across stored transactions.</div>
+            </article>
+        </section>
+
+        <section class="workspace">
+            <article class="panel">
+                <div class="panel-header">
+                    <div>
+                        <div class="panel-title">Register User</div>
+                        <div class="panel-subtitle">Create a persistent user profile with address geocoding and optional age for better scoring context.</div>
+                    </div>
+                </div>
+                <form id="registerForm" class="form-grid">
+                    <div class="field-grid">
+                        <div class="form-group">
+                            <label for="username">Username</label>
+                            <input id="username" name="username" type="text" title="Username" placeholder="jane_doe" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input id="email" name="email" type="email" title="Email address" placeholder="jane@example.com" required>
+                        </div>
+                    </div>
+                    <div class="field-grid">
+                        <div class="form-group">
+                            <label for="phoneNumber">Phone Number</label>
+                            <input id="phoneNumber" name="phone_number" type="text" title="Phone number" placeholder="+2348012345678" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="cardholderAge">Cardholder Age</label>
+                            <input id="cardholderAge" name="cardholder_age" type="number" title="Cardholder age" placeholder="32" min="18" max="100">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="address">Postal Address</label>
+                        <input id="address" name="address" type="text" title="Postal address" placeholder="12 Allen Avenue, Ikeja, Lagos" required>
+                    </div>
+                    <button class="btn-primary" type="submit">Create User Profile</button>
+                    <div id="registerAlert" class="alert"></div>
+                </form>
+
+                <div class="panel-header section-top-gap">
+                    <div>
+                        <div class="panel-title">Delete User</div>
+                        <div class="panel-subtitle">Permanently removes the selected user and all linked records.</div>
+                    </div>
+                </div>
+                <form id="deleteUserForm" class="form-grid">
+                    <div class="form-group">
+                        <label for="deleteUserSelect">User To Delete</label>
+                        <select id="deleteUserSelect" title="User to delete" required></select>
+                    </div>
+                    <button class="btn-secondary" type="submit">Delete Selected User</button>
+                    <div id="deleteUserAlert" class="alert"></div>
+                </form>
+            </article>
+
+            <article class="panel panel-dark">
+                <div class="panel-header">
+                    <div>
+                        <div class="panel-title">Score Transaction</div>
+                        <div class="panel-subtitle">The API now derives velocity, device trust, distance from home, and review decisions from stored user data.</div>
+                    </div>
+                </div>
+                <form id="predictForm" class="form-grid">
+                    <div class="form-group">
+                        <label for="userSelect">Registered User</label>
+                        <select id="userSelect" name="user_id" title="Registered user" required></select>
+                    </div>
+                    <div class="field-grid">
+                        <div class="form-group">
+                            <label for="amount">Amount</label>
+                            <input id="amount" name="amount" type="number" title="Transaction amount" placeholder="250.00" min="0.01" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="currency">Currency</label>
+                            <input id="currency" type="text" title="Transaction currency" value="NGN - Nigerian Naira" readonly>
+                            <input type="hidden" name="currency" value="NGN">
+                        </div>
+                    </div>
+                    <div class="field-grid">
+                        <div class="form-group">
+                            <label for="merchantName">Merchant Name</label>
+                            <input id="merchantName" name="merchant_name" type="text" title="Merchant name" placeholder="Acme Electronics" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="merchantCategory">Merchant Category</label>
+                            <select id="merchantCategory" name="merchant_category" title="Merchant category" required></select>
+                        </div>
+                    </div>
+                    <div class="field-grid">
+                        <div class="form-group">
+                            <label for="transactionTime">Timestamp</label>
+                            <input id="transactionTime" name="timestamp" type="datetime-local" title="Transaction timestamp">
+                        </div>
+                        <div class="form-group">
+                            <label for="deviceFingerprint">Device Fingerprint</label>
+                            <input id="deviceFingerprint" name="device_fingerprint" type="text" title="Device fingerprint" placeholder="browser-ip-device hash">
+                        </div>
+                    </div>
+                    <div class="field-grid">
+                        <div class="form-group">
+                            <label for="latitude">Latitude</label>
+                            <input id="latitude" name="latitude" type="number" title="Transaction latitude" placeholder="6.5244" step="0.000001">
+                        </div>
+                        <div class="form-group">
+                            <label for="longitude">Longitude</label>
+                            <input id="longitude" name="longitude" type="number" title="Transaction longitude" placeholder="3.3792" step="0.000001">
+                        </div>
+                    </div>
+                    <div class="field-grid">
+                        <div class="form-group">
+                            <label for="ipCountry">IP Country</label>
+                            <input id="ipCountry" name="ip_country" type="text" title="IP country" placeholder="Nigeria">
+                        </div>
+                        <div class="form-group">
+                            <label for="ipCity">IP City</label>
+                            <input id="ipCity" name="ip_city" type="text" title="IP city" placeholder="Lagos">
+                        </div>
+                    </div>
+                    <button class="btn-primary" type="submit">Run Fraud Analysis</button>
+                </form>
+                <div id="predictionResult" class="result-grid"></div>
+                <div id="predictAlert" class="alert"></div>
+            </article>
+        </section>
+
+        <section class="tables-grid">
+            <article class="panel">
+                <div class="panel-header">
+                    <div>
+                        <div class="panel-title">Recent Transactions</div>
+                        <div class="panel-subtitle">Latest scored activity with stored analyst context.</div>
+                    </div>
+                    <button class="btn-secondary" type="button" id="refreshButton">Refresh</button>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Transaction</th>
+                                <th>User</th>
+                                <th>Amount</th>
+                                <th>Risk</th>
+                                <th>Decision</th>
+                                <th>Probability</th>
+                                <th>Risk Factors</th>
+                                <th>Time</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentTransactionsBody"></tbody>
+                    </table>
+                </div>
+            </article>
+
+            <article class="panel">
+                <div class="panel-header">
+                    <div>
+                        <div class="panel-title">Analyst Review Queue</div>
+                        <div class="panel-subtitle">Flagged transactions requiring review or already blocked.</div>
+                    </div>
+                </div>
+                <div id="reviewQueue" class="list"></div>
+            </article>
+        </section>
+
+        <section class="support-grid">
+            <article class="panel">
+                <div class="panel-header">
+                    <div>
+                        <div class="panel-title">High-Value Alerts</div>
+                        <div class="panel-subtitle">Transactions above the configured analyst threshold.</div>
+                    </div>
+                </div>
+                <div id="highAmountAlerts" class="list"></div>
+            </article>
+
+            <article class="panel">
+                <div class="panel-header">
+                    <div>
+                        <div class="panel-title">Device and Session Context</div>
+                        <div class="panel-subtitle">Current client fingerprint details and selected user history.</div>
+                    </div>
+                </div>
+                <div class="device-box">
+                    <div class="device-line"><strong>IP Address:</strong> <span id="deviceIp">Loading</span></div>
+                    <div class="device-line"><strong>Device ID:</strong> <span id="deviceId">Loading</span></div>
+                    <div class="device-line"><strong>Fingerprint:</strong> <span id="deviceFingerprintPreview">Loading</span></div>
+                    <div class="device-line"><strong>User Agent:</strong> <span id="deviceAgent">Loading</span></div>
+                </div>
+                <div class="panel-header">
+                    <div>
+                        <div class="panel-title">Selected User History</div>
+                        <div class="panel-subtitle">Most recent transactions for the currently selected account.</div>
+                    </div>
+                </div>
+                <div id="userHistory" class="list"></div>
+            </article>
+        </section>
+
+        <div class="footer-note">Fraud detection dashboard backed by Flask, PostgreSQL, XGBoost, and structured audit logging.</div>
+    </main>
+
+    <script>
+        const apiBase = '/api';
+        const state = {
+            users: [],
+            merchantCategories: [],
+            authToken: localStorage.getItem('analystToken') || ''
+        };
+
+        function getAuthHeaders(extraHeaders = {}) {
+            const headers = { ...extraHeaders };
+            if (state.authToken) {
+                headers.Authorization = `Bearer ${state.authToken}`;
+            }
+            return headers;
+        }
+
+        function setAuthenticatedUI(isAuthenticated) {
+            document.getElementById('authGate').classList.toggle('is-hidden', isAuthenticated);
+            document.getElementById('dashboardShell').classList.toggle('is-hidden', !isAuthenticated);
+        }
+
+        function setAlert(element, message, type) {
+            element.className = `alert show alert-${type}`;
+            element.innerHTML = message;
+        }
+
+        function clearAlert(element) {
+            element.className = 'alert';
+            element.textContent = '';
+        }
+
+        function currency(value, currencyCode = 'NGN') {
+            const numeric = Number(value || 0);
+            try {
+                return new Intl.NumberFormat(undefined, {
+                    style: 'currency',
+                    currency: currencyCode || 'NGN',
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }).format(numeric);
+            } catch (_error) {
+                return `${currencyCode || 'NGN'} ${numeric.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            }
+        }
+
+        function dateTime(value) {
+            if (!value) {
+                return 'N/A';
+            }
+            return new Date(value).toLocaleString();
+        }
+
+        function badgeClass(value, type) {
+            return `${type === 'decision' ? 'decision' : 'risk'}-${String(value || '').toLowerCase()}`;
+        }
+
+        function riskFactorText(factors) {
+            if (!factors || !Array.isArray(factors) || factors.length === 0) {
+                return 'No explicit risk factors';
+            }
+            return factors.join(', ');
+        }
+
+        async function fetchJson(path, options) {
+            const requestOptions = options ? { ...options } : {};
+            requestOptions.headers = getAuthHeaders(requestOptions.headers || {});
+            const response = await fetch(`${apiBase}${path}`, requestOptions);
+            const data = await response.json().catch(() => ({}));
+            if (!response.ok) {
+                throw new Error(data.error || (data.errors && data.errors.join(', ')) || 'Request failed');
+            }
+            return data;
+        }
+
+        function populateUserSelect() {
+            const select = document.getElementById('userSelect');
+            if (state.users.length === 0) {
+                select.innerHTML = '<option value="">No users registered yet</option>';
+                return;
+            }
+
+            select.innerHTML = state.users.map((user) => {
+                const city = user.registered_city || 'Unknown city';
+                return `<option value="${user.user_id}">${user.username} (${city})</option>`;
+            }).join('');
+        }
+
+        function populateDeleteUserSelect() {
+            const select = document.getElementById('deleteUserSelect');
+            if (state.users.length === 0) {
+                select.innerHTML = '<option value="">No users available</option>';
+                return;
+            }
+
+            select.innerHTML = state.users.map((user) => {
+                const city = user.registered_city || 'Unknown city';
+                return `<option value="${user.user_id}">${user.username} (${city})</option>`;
+            }).join('');
+        }
+
+        function populateMerchantCategories(categories) {
+            state.merchantCategories = categories || state.merchantCategories;
+            const select = document.getElementById('merchantCategory');
+            const source = state.merchantCategories.length ? state.merchantCategories : ['Clothing', 'Electronics', 'Food', 'Grocery', 'Travel'];
+            select.innerHTML = source.map((category) => `<option value="${category}">${category}</option>`).join('');
+            document.getElementById('categoryCount').textContent = source.length;
+        }
+
+        function renderTransactions(transactions) {
+            const tbody = document.getElementById('recentTransactionsBody');
+            if (!transactions.length) {
+                tbody.innerHTML = '<tr><td colspan="8" class="empty-state">No transactions have been scored yet.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = transactions.map((transaction) => `
+                <tr>
+                    <td>${transaction.transaction_id}</td>
+                    <td>${transaction.username || transaction.user_id}</td>
+                    <td>${currency(transaction.amount, transaction.currency || 'NGN')}</td>
+                    <td><span class="badge ${badgeClass(transaction.risk_level, 'risk')}">${transaction.risk_level}</span></td>
+                    <td><span class="badge ${badgeClass(transaction.status, 'decision')}">${transaction.status}</span></td>
+                    <td>${(Number(transaction.confidence_score || 0) * 100).toFixed(1)}%</td>
+                    <td>${riskFactorText(transaction.risk_factors)}</td>
+                    <td>${dateTime(transaction.timestamp)}</td>
+                </tr>
+            `).join('');
+        }
+
+        function renderList(containerId, items, formatter, emptyText) {
+            const container = document.getElementById(containerId);
+            if (!items.length) {
+                container.innerHTML = `<div class="list-card"><div class="list-meta">${emptyText}</div></div>`;
+                return;
+            }
+
+            container.innerHTML = items.map(formatter).join('');
+        }
+
+        async function loadUsers() {
+            const data = await fetchJson('/users');
+            state.users = data.users || [];
+            populateUserSelect();
+            populateDeleteUserSelect();
+            document.getElementById('heroUserCount').textContent = state.users.length;
+            if (state.users.length) {
+                await loadUserHistory(state.users[0].user_id);
+            } else {
+                renderList('userHistory', [], () => '', 'Register a user to start collecting transaction history.');
+            }
+        }
+
+        async function loadUserHistory(userId) {
+            if (!userId) {
+                renderList('userHistory', [], () => '', 'Select a user to inspect account activity.');
+                return;
+            }
+
+            const data = await fetchJson(`/users/${userId}/transactions`);
+            renderList(
+                'userHistory',
+                data.transactions || [],
+                (transaction) => `
+                    <div class="list-card">
+                        <strong>${transaction.merchant_name}</strong>
+                        <div class="list-meta">${currency(transaction.amount, transaction.currency || 'NGN')} | ${transaction.merchant_category} | ${dateTime(transaction.timestamp)}</div>
+                        <div class="list-meta">${transaction.status} with ${(Number(transaction.confidence_score || 0) * 100).toFixed(1)}% fraud probability</div>
+                    </div>
+                `,
+                'No transaction history is available for this user yet.'
+            );
+        }
+
+        async function loadDeviceInfo() {
+            const data = await fetchJson('/device-info');
+            document.getElementById('deviceIp').textContent = data.ip_address || 'Unavailable';
+            document.getElementById('deviceId').textContent = data.device_id || 'Unavailable';
+            document.getElementById('deviceFingerprintPreview').textContent = data.device_fingerprint || 'Unavailable';
+            document.getElementById('deviceAgent').textContent = data.user_agent || 'Unavailable';
+            if (!state.merchantCategories.length && data.merchant_categories) {
+                populateMerchantCategories(data.merchant_categories);
+            }
+        }
+
+        async function loadHealth() {
+            try {
+                const response = await fetch(`${apiBase}/health`, { headers: getAuthHeaders() });
+                const data = await response.json();
+                const healthy = response.ok && data.status === 'healthy';
+                document.getElementById('statusText').textContent = healthy ? 'System healthy' : `System ${data.status || 'degraded'}`;
+                document.getElementById('statusDot').style.background = healthy ? '#22c55e' : '#f59e0b';
+                document.getElementById('statusDot').style.boxShadow = healthy ? '0 0 0 6px rgba(34, 197, 94, 0.18)' : '0 0 0 6px rgba(245, 158, 11, 0.18)';
+                if (data.merchant_categories) {
+                    populateMerchantCategories(data.merchant_categories);
+                }
+            } catch (error) {
+                document.getElementById('statusText').textContent = 'System unavailable';
+                document.getElementById('statusDot').style.background = '#b42318';
+                document.getElementById('statusDot').style.boxShadow = '0 0 0 6px rgba(180, 35, 24, 0.18)';
+            }
+        }
+
+        async function updateDashboard() {
+            const data = await fetchJson('/dashboard-data');
+            document.getElementById('totalTransactions').textContent = data.total_transactions || 0;
+            document.getElementById('fraudCount').textContent = data.fraud_count || 0;
+            document.getElementById('fraudRate').textContent = `${Number(data.fraud_rate || 0).toFixed(2)}%`;
+            document.getElementById('averageProbability').textContent = `${(Number(data.average_fraud_probability || 0) * 100).toFixed(1)}%`;
+            document.getElementById('heroReviewCount').textContent = data.review_queue_count || 0;
+            document.getElementById('heroBlockedAmount').textContent = currency(data.blocked_amount || 0);
+            document.getElementById('heroUserCount').textContent = data.registered_users || 0;
+            populateMerchantCategories(data.merchant_categories || []);
+            renderTransactions(data.recent_transactions || []);
+            renderList(
+                'reviewQueue',
+                data.flagged_transactions || [],
+                (transaction) => `
+                    <div class="list-card">
+                        <strong>${transaction.username} | ${currency(transaction.amount, transaction.currency || 'NGN')}</strong>
+                        <div class="list-meta">${transaction.merchant_name} | ${transaction.status} | ${dateTime(transaction.timestamp)}</div>
+                        <div class="list-meta">${riskFactorText(transaction.risk_factors)}</div>
+                    </div>
+                `,
+                'No flagged transactions are waiting for analyst review.'
+            );
+            renderList(
+                'highAmountAlerts',
+                data.high_amount_alerts || [],
+                (transaction) => `
+                    <div class="list-card">
+                        <strong>${transaction.username} | ${currency(transaction.amount, transaction.currency || 'NGN')}</strong>
+                        <div class="list-meta">${transaction.merchant_name} | ${transaction.status} | ${dateTime(transaction.timestamp)}</div>
+                    </div>
+                `,
+                'No high-value transactions have crossed the analyst threshold yet.'
+            );
+        }
+
+        document.getElementById('registerForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const form = new FormData(event.target);
+            const payload = Object.fromEntries(form.entries());
+            const alertBox = document.getElementById('registerAlert');
+            clearAlert(alertBox);
+
+            try {
+                const result = await fetchJson('/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                setAlert(alertBox, `User ${result.user.username} created with id ${result.user_id}. Geocoded: ${result.geocoded ? 'yes' : 'no'}.`, 'success');
+                event.target.reset();
+                await loadUsers();
+                await updateDashboard();
+            } catch (error) {
+                setAlert(alertBox, error.message, 'error');
+            }
+        });
+
+        document.getElementById('deleteUserForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const selectedUserId = document.getElementById('deleteUserSelect').value;
+            const alertBox = document.getElementById('deleteUserAlert');
+            clearAlert(alertBox);
+
+            if (!selectedUserId) {
+                setAlert(alertBox, 'Select a user to delete.', 'error');
+                return;
+            }
+
+            const selectedUser = state.users.find((user) => user.user_id === selectedUserId);
+            const displayName = selectedUser ? selectedUser.username : selectedUserId;
+            const shouldDelete = window.confirm(`Delete user ${displayName}? This cannot be undone.`);
+            if (!shouldDelete) {
+                return;
+            }
+
+            try {
+                const result = await fetchJson(`/users/${selectedUserId}`, {
+                    method: 'DELETE'
+                });
+
+                setAlert(alertBox, result.message || 'User deleted successfully.', 'success');
+                await loadUsers();
+                await updateDashboard();
+            } catch (error) {
+                setAlert(alertBox, error.message, 'error');
+            }
+        });
+
+        document.getElementById('predictForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const form = new FormData(event.target);
+            const payload = Object.fromEntries(form.entries());
+            const alertBox = document.getElementById('predictAlert');
+            const resultBox = document.getElementById('predictionResult');
+            clearAlert(alertBox);
+            resultBox.innerHTML = '';
+
+            if (!payload.timestamp) {
+                delete payload.timestamp;
+            }
+            ['latitude', 'longitude'].forEach((field) => {
+                if (!payload[field]) {
+                    delete payload[field];
+                }
+            });
+            if (!payload.device_fingerprint) {
+                delete payload.device_fingerprint;
+            }
+
+            try {
+                const result = await fetchJson('/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                resultBox.innerHTML = `
+                    <div class="result-row"><span class="muted">Decision</span><strong>${result.decision}</strong></div>
+                    <div class="result-row"><span class="muted">Risk Level</span><span class="badge ${badgeClass(result.risk_level, 'risk')}">${result.risk_level}</span></div>
+                    <div class="result-row"><span class="muted">Fraud Probability</span><strong>${(Number(result.fraud_probability) * 100).toFixed(2)}%</strong></div>
+                    <div class="result-row"><span class="muted">Processing Time</span><strong>${Number(result.processing_time_ms).toFixed(2)} ms</strong></div>
+                    <div class="result-row"><span class="muted">Distance From Home</span><strong>${result.distance_from_home_km === null ? 'N/A' : `${result.distance_from_home_km} km`}</strong></div>
+                    <div class="result-row"><span class="muted">Velocity Last 24h</span><strong>${result.velocity_last_24h}</strong></div>
+                    <div class="result-row"><span class="muted">Risk Factors</span><strong>${result.risk_factors.length ? result.risk_factors.join(', ') : 'None'}</strong></div>
+                `;
+                setAlert(alertBox, `Transaction ${result.transaction_id} stored successfully.`, 'success');
+                await updateDashboard();
+                await loadUserHistory(payload.user_id);
+            } catch (error) {
+                setAlert(alertBox, error.message, 'error');
+            }
+        });
+
+        document.getElementById('userSelect').addEventListener('change', async (event) => {
+            await loadUserHistory(event.target.value);
+        });
+
+        document.getElementById('refreshButton').addEventListener('click', async () => {
+            await Promise.all([updateDashboard(), loadUsers(), loadDeviceInfo(), loadHealth()]);
+        });
+
+        document.getElementById('authForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const form = new FormData(event.target);
+            const payload = Object.fromEntries(form.entries());
+            const alertBox = document.getElementById('authAlert');
+            clearAlert(alertBox);
+
+            try {
+                const result = await fetchJson('/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                state.authToken = result.token;
+                localStorage.setItem('analystToken', result.token);
+                setAuthenticatedUI(true);
+                await initializeDashboard();
+            } catch (error) {
+                setAlert(alertBox, error.message, 'error');
+            }
+        });
+
+        async function initializeDashboard() {
+            await Promise.all([loadHealth(), loadUsers(), loadDeviceInfo(), updateDashboard()]);
+        }
+
+        async function tryResumeSession() {
+            if (!state.authToken) {
+                setAuthenticatedUI(false);
+                return;
+            }
+
+            try {
+                await fetchJson('/auth/validate');
+                setAuthenticatedUI(true);
+                await initializeDashboard();
+            } catch (error) {
+                state.authToken = '';
+                localStorage.removeItem('analystToken');
+                setAuthenticatedUI(false);
+            }
+        }
+
+        async function initialize() {
+            await tryResumeSession();
+        }
+
+        initialize();
+        setInterval(async () => {
+            if (state.authToken && !document.getElementById('dashboardShell').classList.contains('is-hidden')) {
+                try {
+                    await updateDashboard();
+                } catch (error) {
+                    console.error(error);
+                }
+            }
+        }, 5000);
+    </script>
+</body>
+</html>
