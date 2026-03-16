@@ -47,6 +47,7 @@ logger = logging.getLogger(__name__)
 MODEL_CATEGORIES_FALLBACK = ['Clothing', 'Electronics', 'Food', 'Grocery', 'Travel']
 DB_POOL = None
 HIGH_AMOUNT_THRESHOLD = float(os.getenv('HIGH_AMOUNT_THRESHOLD', '500'))
+MAX_TRANSACTION_AMOUNT = float(os.getenv('MAX_TRANSACTION_AMOUNT', '99999999.99'))
 DEFAULT_TRANSACTION_LATITUDE = float(os.getenv('DEFAULT_TRANSACTION_LATITUDE', '6.5244'))
 DEFAULT_TRANSACTION_LONGITUDE = float(os.getenv('DEFAULT_TRANSACTION_LONGITUDE', '3.3792'))
 DEFAULT_TRANSACTION_CITY = os.getenv('DEFAULT_TRANSACTION_CITY', 'Lagos')
@@ -861,7 +862,7 @@ def validate_registration_input(payload):
 
 def validate_transaction_input(payload):
     errors = []
-    required_fields = ['user_id', 'amount', 'merchant_name', 'merchant_category']
+    required_fields = ['user_id', 'amount', 'merchant_name']
 
     for field in required_fields:
         if payload.get(field) in (None, ''):
@@ -870,8 +871,10 @@ def validate_transaction_input(payload):
     amount = to_float(payload.get('amount'))
     if amount is None or amount <= 0:
         errors.append('Amount must be a positive number')
+    elif amount > MAX_TRANSACTION_AMOUNT:
+        errors.append(f'Amount must be less than or equal to {MAX_TRANSACTION_AMOUNT:,.2f}')
 
-    merchant_category = normalize_merchant_category(payload.get('merchant_category'))
+    merchant_category = normalize_merchant_category(payload.get('merchant_category') or MODEL_CATEGORIES[0])
     if merchant_category is None:
         errors.append(f"merchant_category must be one of: {', '.join(MODEL_CATEGORIES)}")
 
@@ -1641,6 +1644,8 @@ def get_users():
 def predict_fraud():
     payload = request.get_json(silent=True) or {}
     try:
+        if not payload.get('merchant_category'):
+            payload['merchant_category'] = MODEL_CATEGORIES[0]
         response = run_transaction_scoring(payload, request.headers.get('User-Agent', 'Unknown'), get_client_ip())
         return jsonify(response), 200
     except RequestError as exc:
@@ -2105,8 +2110,11 @@ def get_device_info():
     ip_address = get_client_ip()
     user_agent = request.headers.get('User-Agent', 'Unknown')
     device_fingerprint = get_device_fingerprint({}, ip_address, user_agent)
+    ip_risk = lookup_ip_risk(ip_address)
     return jsonify({
         'ip_address': ip_address,
+        'ip_country': ip_risk.get('ip_country') or DEFAULT_TRANSACTION_COUNTRY,
+        'ip_city': ip_risk.get('ip_city') or DEFAULT_TRANSACTION_CITY,
         'user_agent': user_agent,
         'device_id': hashlib.sha256(f'{ip_address}|{user_agent}'.encode('utf-8')).hexdigest()[:16],
         'device_fingerprint': device_fingerprint,

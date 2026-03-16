@@ -238,6 +238,66 @@
             gap: 6px;
         }
 
+        .toggle-group {
+            align-content: start;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-flex;
+            width: 56px;
+            height: 32px;
+            cursor: pointer;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+            position: absolute;
+        }
+
+        .slider {
+            position: absolute;
+            inset: 0;
+            border-radius: 999px;
+            background: rgba(148, 163, 184, 0.35);
+            border: 1px solid rgba(148, 163, 184, 0.45);
+            transition: background 0.2s ease, border-color 0.2s ease;
+        }
+
+        .slider::before {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            left: 3px;
+            top: 3px;
+            border-radius: 50%;
+            background: #fffdf7;
+            box-shadow: 0 8px 18px rgba(15, 23, 42, 0.22);
+            transition: transform 0.2s ease;
+        }
+
+        .switch input:checked + .slider {
+            background: rgba(34, 197, 94, 0.32);
+            border-color: rgba(34, 197, 94, 0.65);
+        }
+
+        .switch input:checked + .slider::before {
+            transform: translateX(24px);
+        }
+
+        .panel-dark .slider {
+            background: rgba(255, 255, 255, 0.14);
+            border-color: rgba(255, 255, 255, 0.18);
+        }
+
+        .panel-dark .switch input:checked + .slider {
+            background: rgba(74, 222, 128, 0.34);
+            border-color: rgba(74, 222, 128, 0.68);
+        }
+
         label {
             font-size: 12px;
             letter-spacing: 0.08em;
@@ -646,7 +706,7 @@
                     <div class="field-grid">
                         <div class="form-group">
                             <label for="amount">Amount</label>
-                            <input id="amount" name="amount" type="number" title="Transaction amount" placeholder="250.00" min="0.01" step="0.01" required>
+                            <input id="amount" name="amount" type="number" title="Transaction amount" placeholder="250.00" min="0.01" max="99999999.99" step="0.01" required>
                         </div>
                         <div class="form-group">
                             <label for="currency">Currency</label>
@@ -656,12 +716,16 @@
                     </div>
                     <div class="field-grid">
                         <div class="form-group">
-                            <label for="merchantName">Merchant Name</label>
-                            <input id="merchantName" name="merchant_name" type="text" title="Merchant name" placeholder="Acme Electronics" required>
+                            <label for="merchantName">Transaction Category / Label</label>
+                            <input id="merchantName" name="merchant_name" type="text" title="Transaction category or label" placeholder="Clothing Purchase" required>
                         </div>
-                        <div class="form-group">
-                            <label for="merchantCategory">Merchant Category</label>
-                            <select id="merchantCategory" name="merchant_category" title="Merchant category" required></select>
+                        <div class="form-group toggle-group">
+                            <label for="autoContextToggle">Auto Device Context</label>
+                            <label class="switch" title="Use this analyst device for timestamp, fingerprint, and location context">
+                                <input id="autoContextToggle" type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                            <div class="panel-subtitle" id="autoContextStatus">Uses this analyst device for timestamp, fingerprint, and IP/location context.</div>
                         </div>
                     </div>
                     <div class="field-grid">
@@ -782,6 +846,8 @@
         const state = {
             users: [],
             merchantCategories: [],
+            analystDeviceInfo: null,
+            analystLocation: null,
             authToken: localStorage.getItem('analystToken') || ''
         };
 
@@ -879,10 +945,124 @@
 
         function populateMerchantCategories(categories) {
             state.merchantCategories = categories || state.merchantCategories;
-            const select = document.getElementById('merchantCategory');
             const source = state.merchantCategories.length ? state.merchantCategories : ['Clothing', 'Electronics', 'Food', 'Grocery', 'Travel'];
-            select.innerHTML = source.map((category) => `<option value="${category}">${category}</option>`).join('');
             document.getElementById('categoryCount').textContent = source.length;
+        }
+
+        function formatDateTimeLocal(date = new Date()) {
+            const value = new Date(date);
+            const year = value.getFullYear();
+            const month = String(value.getMonth() + 1).padStart(2, '0');
+            const day = String(value.getDate()).padStart(2, '0');
+            const hours = String(value.getHours()).padStart(2, '0');
+            const minutes = String(value.getMinutes()).padStart(2, '0');
+            return `${year}-${month}-${day}T${hours}:${minutes}`;
+        }
+
+        function syncAutoContextFields() {
+            const autoContextEnabled = document.getElementById('autoContextToggle')?.checked;
+            const timestampField = document.getElementById('transactionTime');
+            const deviceFingerprintField = document.getElementById('deviceFingerprint');
+            const latitudeField = document.getElementById('latitude');
+            const longitudeField = document.getElementById('longitude');
+            const ipCountryField = document.getElementById('ipCountry');
+            const ipCityField = document.getElementById('ipCity');
+            const statusField = document.getElementById('autoContextStatus');
+            const hasBrowserCoordinates = state.analystLocation?.latitude != null && state.analystLocation?.longitude != null;
+
+            if (autoContextEnabled) {
+                timestampField.value = formatDateTimeLocal(new Date());
+                deviceFingerprintField.value = state.analystDeviceInfo?.device_fingerprint || '';
+                latitudeField.value = hasBrowserCoordinates ? Number(state.analystLocation.latitude).toFixed(6) : '';
+                longitudeField.value = hasBrowserCoordinates ? Number(state.analystLocation.longitude).toFixed(6) : '';
+                ipCountryField.value = state.analystLocation?.country || state.analystDeviceInfo?.ip_country || '';
+                ipCityField.value = state.analystLocation?.city || state.analystDeviceInfo?.ip_city || '';
+            }
+
+            [timestampField, deviceFingerprintField, latitudeField, longitudeField, ipCountryField, ipCityField].forEach((field) => {
+                field.readOnly = autoContextEnabled;
+            });
+
+            if (!statusField) {
+                return;
+            }
+
+            if (!autoContextEnabled) {
+                statusField.textContent = 'Manual mode enabled. You can edit timestamp, fingerprint, and location fields.';
+            } else if (hasBrowserCoordinates && state.analystLocation?.country) {
+                statusField.textContent = 'Using this analyst device fingerprint, current time, browser coordinates, and browser-derived city/country.';
+            } else if (hasBrowserCoordinates) {
+                statusField.textContent = 'Using this analyst device fingerprint and browser coordinates. City/country are from IP fallback.';
+            } else {
+                statusField.textContent = 'Using this analyst device fingerprint, current time, and IP-based city/country fallback.';
+            }
+        }
+
+        async function reverseGeocodeAnalystLocation(latitude, longitude) {
+            const lat = Number(latitude);
+            const lon = Number(longitude);
+            if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
+                return null;
+            }
+
+            const endpoint = `https://nominatim.openstreetmap.org/reverse?lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}&format=jsonv2&addressdetails=1`;
+            try {
+                const response = await fetch(endpoint, {
+                    headers: {
+                        Accept: 'application/json',
+                    },
+                });
+                if (!response.ok) {
+                    return null;
+                }
+
+                const payload = await response.json();
+                const address = payload?.address || {};
+                const city = address.city || address.town || address.village || address.municipality || address.county || '';
+                const country = address.country || '';
+                return {
+                    city,
+                    country,
+                };
+            } catch (_error) {
+                return null;
+            }
+        }
+
+        async function detectAnalystLocation() {
+            if (!navigator.geolocation) {
+                state.analystLocation = null;
+                syncAutoContextFields();
+                return;
+            }
+
+            await new Promise((resolve) => {
+                navigator.geolocation.getCurrentPosition(
+                    async (position) => {
+                        state.analystLocation = {
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude,
+                        };
+                        const geoDetails = await reverseGeocodeAnalystLocation(position.coords.latitude, position.coords.longitude);
+                        if (geoDetails) {
+                            state.analystLocation.city = geoDetails.city;
+                            state.analystLocation.country = geoDetails.country;
+                        }
+                        syncAutoContextFields();
+                        resolve();
+                    },
+                    () => {
+                        state.analystLocation = null;
+                        syncAutoContextFields();
+                        resolve();
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 8000,
+                        maximumAge: 120000,
+                    }
+                );
+            });
         }
 
         function renderTransactions(transactions) {
@@ -952,6 +1132,7 @@
 
         async function loadDeviceInfo() {
             const data = await fetchJson('/device-info');
+            state.analystDeviceInfo = data;
             document.getElementById('deviceIp').textContent = data.ip_address || 'Unavailable';
             document.getElementById('deviceId').textContent = data.device_id || 'Unavailable';
             document.getElementById('deviceFingerprintPreview').textContent = data.device_fingerprint || 'Unavailable';
@@ -959,6 +1140,7 @@
             if (!state.merchantCategories.length && data.merchant_categories) {
                 populateMerchantCategories(data.merchant_categories);
             }
+            syncAutoContextFields();
         }
 
         async function loadHealth() {
@@ -1070,12 +1252,15 @@
 
         document.getElementById('predictForm').addEventListener('submit', async (event) => {
             event.preventDefault();
+            syncAutoContextFields();
             const form = new FormData(event.target);
             const payload = Object.fromEntries(form.entries());
             const alertBox = document.getElementById('predictAlert');
             const resultBox = document.getElementById('predictionResult');
             clearAlert(alertBox);
             resultBox.innerHTML = '';
+
+            payload.merchant_category = state.merchantCategories[0] || 'Clothing';
 
             if (!payload.timestamp) {
                 delete payload.timestamp;
@@ -1088,6 +1273,11 @@
             if (!payload.device_fingerprint) {
                 delete payload.device_fingerprint;
             }
+            ['ip_country', 'ip_city'].forEach((field) => {
+                if (!payload[field]) {
+                    delete payload[field];
+                }
+            });
 
             try {
                 const result = await fetchJson('/predict', {
@@ -1117,8 +1307,12 @@
             await loadUserHistory(event.target.value);
         });
 
+        document.getElementById('autoContextToggle').addEventListener('change', () => {
+            syncAutoContextFields();
+        });
+
         document.getElementById('refreshButton').addEventListener('click', async () => {
-            await Promise.all([updateDashboard(), loadUsers(), loadDeviceInfo(), loadHealth()]);
+            await Promise.all([updateDashboard(), loadUsers(), loadDeviceInfo(), loadHealth(), detectAnalystLocation()]);
         });
 
         document.getElementById('authForm').addEventListener('submit', async (event) => {
@@ -1144,7 +1338,7 @@
         });
 
         async function initializeDashboard() {
-            await Promise.all([loadHealth(), loadUsers(), loadDeviceInfo(), updateDashboard()]);
+            await Promise.all([loadHealth(), loadUsers(), loadDeviceInfo(), updateDashboard(), detectAnalystLocation()]);
         }
 
         async function tryResumeSession() {
