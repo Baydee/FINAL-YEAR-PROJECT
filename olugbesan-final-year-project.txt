@@ -1,0 +1,1597 @@
+I
+
+SEMANTIC QUESTION-ANSWERING USING RETRIEVAL-AUGMENTED AI
+
+BY
+
+OLUGBESAN OLUWATAMILORE AYOOLUWAKIITAN
+21/1206
+ONUORAH GODSON CHIDERA
+22/2022
+
+A PROJECT SUBMITTED IN PARTIAL FULFILLMENT OF THE
+REQUIREMENTS FOR THE AWARD OF BACHELOR OF SCIENCE B.SC(HONS)
+DEGREE IN COMPUTER SCIENCE
+
+TO THE DEPARTMENT OF COMPUTER SCIENCE, SCHOOL OF COMPUTING
+BABCOCK UNIVERSITY, ILISHAN-REMO, OGUN STATE, NIGERIA
+
+NOVEMBER, 2025
+
+II
+
+DECLARATION
+
+We declare that the project work “SEMANTIC QUESTION ANSWERING USING
+RETRIEVAL-AUGUMENTED AI” was carried out by the following people:
+
+OLUGBESAN OLUWATAMILORE AYOOLUWAKIITAN
+
+____________________
+
+21/1206
+
+SIGNATURE/DATE
+
+ONUORAH GODSON CHIDERA
+
+____________________
+
+22/2022
+
+SIGNATURE/DATE
+
+III
+
+CERTIFICATION
+
+I certify that this project was carried out by the following student under my supervision in the
+department of Computer Science, School of Computing, Babcock University, Ilishan-Remo,
+Ogun State, Nigeria.
+OLUGBESAN OLUWATAMILORE AYOOLUWAKIITAN 21/1206
+ONUORAH GODSON CHIDERA 22/2022
+
+__________________________
+MR. AMUSAN AFOLARIN
+
+__________________________
+DATE
+
+(PROJECT SUPERVISOR)
+
+__________________________
+EXTERNAL EXAMINER
+
+__________________________
+
+__________________________
+DATE
+
+__________________________
+
+DR. SEUN EBIESUWA
+(HEAD OF DEPARTMENT)
+
+DATE
+
+DEDICATION
+
+IV
+
+We dedicate this project to God Almighty, whose grace, wisdom, and strength has guided us
+through to its completion.
+
+ACKNOWLEDGEMENT
+
+V
+
+We are profoundly thankful to all who, in one way or another, contributed to the successful
+completion of this project. We owe our deepest gratitude to our supervisor, Mr. Amusa
+Afolarin, for his invaluable guidance, insightful feedback, and consistent support throughout
+this journey. His mentorship has been instrumental in shaping the direction and quality of this
+work.
+We also extend our heartfelt appreciation to our families and friends for their encouragement,
+belief in our abilities, and unwavering support, which gave us the strength to persevere.
+Finally, we express our gratitude to Babcock University, the faculty, and our colleagues for
+fostering an academic environment that values learning, innovation, and collaboration. The
+support and opportunities provided by this institution have been essential to the realization of
+this work.
+
+ABSTRACT
+
+VI
+
+This study designs and implements a semantic question-answering system using retrievalaugmented generation (RAG) to address two critical limitations of large language models in
+educational contexts: hallucination of unverifiable responses and the inability to process
+lengthy documents within finite context windows. The system integrates document
+processing, vector embedding, semantic retrieval, and language model generation within a
+three-tier web application. User-uploaded PDF documents are chunked, embedded, and
+indexed in a vector store, enabling semantically relevant passages to be retrieved at query
+time and used to ground model responses, with source citations surfaced alongside every
+answer. By combining selective semantic retrieval with dynamic document management and
+transparent source attribution, the system produces trustworthy, context-aware answers drawn
+directly from user-provided materials, without requiring model fine-tuning or full-document
+processing.
+Keywords: Retrieval-Augmented Generation, Semantic Question Answering, Large
+Language Models, Embeddings, Context Window
+
+TABLE OF CONTENTS
+
+VII
+
+DECLARATION............................................................................................................................ II
+CERTIFICATION......................................................................................................................... III
+DEDICATION....................................................................................................................... .......IV
+ACKNOWLEDGEMENT............ ..................................................................................................V
+ABSTRACT.................................................................................................................................. VI
+TABLE OF CONTENTS.............................................................................................................VII
+LIST OF FIGURES........................................................................................................................ X
+CHAPTER ONE: INTRODUCTION..........................................................................................1
+1.1 BACKGROUNDOF THE STUDY..........................................................................................1
+1.2 PROBLEM STATEMENT........................................................................................................4
+1.3 AIM AND OBJECTIVES OF THE STUDY............................................................................ 4
+1.4 SIGNIFICANCE OF THE STUDY.......................................................................................... 5
+1.5 SCOPE AND LIMITATIONS OF THE STUDY..................................................................... 6
+1.6 RESEARCH QUESTIONS....................................................................................................... 7
+CHAPTER TWO: LITERATURE REVIEW.............................................................................8
+2.1 INTRODUCTION..................................................................................................................... 8
+2.2 EVOLUTION OF QUESTION ANSWERING SYSTEMS..................................................... 8
+2.2.1 KEYWORD-BASED AND INFORMATION RETRIEVAL APPROACHES.........9
+2.2.2 NLP-DRIVEN QA....................................................Error! Bookmark not defined.
+2.2.3 MACHINE LEARNING AND DEEP LEARNING IN QA.................................... 11
+2.2.4 TRANSFORMER-BASED QA................................................................................12
+2.3 SEMANTIC APPROACHES IN QA......................................................................................13
+2.3.1 EMBEDDINGS FOR SEMANTIC REPRESENTATIONS....................................14
+2.3.2 SEMANTIC SIMILARITY SEARCH..................................................................... 15
+2.3.3 MULTI-LAYER REPRESENTATIONS.................................................................16
+2.4 RETREIVAL AUGMENTED GENERATION...................................................................... 17
+
+VIII
+
+2.4.1 CONCEPTUAL FOUNDATIONS OF RAG...........................................................18
+2.4.2 RAG IMPLEMENTATIONS ACROSS DOMAINSError! Bookmark not defined.
+2.4.3 RAG IN EDUCATIONAL CONTEXTS................................................................. 20
+2.4.4 TECHNICAL AND ARCHITECTURAL CONSIDERATIONS............................ 21
+2.4.5 LIMITATIONS OF CURRENT RAG APPROACHES.......................................... 22
+2.5 QA IN THE EDUCATIONAL DOMAIN.............................................................................. 23
+2.5.1 CHALLENGES IN EDUCATIONAL QA.............................................................. 24
+2.5.2 EXISTING EDUCATIONAL QA SYSTEMS........................................................ 24
+2.5.3 LIMITATIONS OF CURRENT APPROACH........................................................ 25
+2.6 RESEARCH GAPS IDENTIFIED.......................................................................................... 25
+2.7 SUMMARY.............................................................................................................................26
+CHAPTER THREE: METHODOLOGY................................................................................. 27
+3.1 INTRODUCTION................................................................................................................... 28
+3.2 FEASIBILITY STUDY...........................................................................................................28
+3.2 TECHNICAL FEASIBILITY..................................................................................... 28
+3.2 ECONOMIC FEASIBILITY.......................................................................................28
+3.2 OPERATIONAL FEASIBILITY................................................................................ 29
+3.3 SYSTEM REQUIREMENTS..................................................................................................29
+3.3.1 FUNCTIONAL REQUIREMENTS.........................................................................29
+3..3.2 NON-FUNCTIONAL REQUIREMENTS..............................................................30
+3.4 SYSTEM DESIGN..................................................................................................................31
+3.4.1 DESIGN PHILOSOPHY AND PRINCIPLES.........................................................31
+3.4.2 ARCHITECTURE OVERVIEW..............................................................................31
+3.4.3 AUTHENTICATION ARCHITECTURE................................................................32
+3.5 TECHNOLOGY SELECTION AND JUSTIFICATION....................................................... 34
+CHAPTER FOUR: SYSTEM IMPLEMENTATION............................................................. 35
+4.1 INTRODUCTION................................................................................................................... 35
+4.2 CORE SYSTEM IMPLEMENTATION................................................................................. 35
+4.2.1 DOCUMENT PROCESSING AND EMBEDDING................................................35
+
+IX
+
+4.2.2 RAG PIPELINE AND ANSWER GENERATION................................................. 36
+4.3 USER INTERFACE IMPLEMENTATION........................................................................... 38
+4.3.1 AUTHENTICATION INTERFACE........................................................................ 38
+4.3.2 DOCUMENT UPLOAD, MANAGEMENT AND VIEWING INTERFACE........ 39
+4.332 QUESTION-ANSWERING INTERFACE............................................................. 40
+4.4 MINIMUM SYSTEM REQUIREMENTS..............................................................................43
+4.5 DEVELOPMENT TOOLS......................................................................................................44
+CHAPTER FIVE: SUMMARY, CONCLUSION AND RECOMMENDATION................. 45
+5.1 SUMMARY.............................................................................................................................45
+5.2 CONCLUSION........................................................................................................................45
+5.3 RECOMMENDATION...........................................................................................................46
+5.4 LIMITATIONS OF THE STUDY.......................................................................................... 46
+5.5 SUGGESTIONA FOR FURTHER STUDY........................................................................... 47
+REFERENCES............................................................................................................................ 48
+
+X
+
+LIST OF FIGURES
+3.1 DIAGRAM OF THE THREE-TIER ARCHITECTURE OVERVIEW................................. 31
+3.2 SEQUENCE DIAGRAM OF THE RAG ENGINE FLOW....................................................32
+3.3 SEQUENCE DIAGRAM OF THE MAGIC LINK AUTH.................................................... 33
+4.1 SIGN UP/LOGIN PAGE UI....................................................................................................38
+4.2 ONBOARDING PAGE UI......................................................................................................39
+4.3 SIDEBAR UI........................................................................................................................... 40
+4.4 CHAT INTERFACE UI.......................................................................................................... 41
+4.5 CHAT INTERFACE WITH CONVERSATION TURNS UI.................................................42
+4.6 FILE VIEWER UI................................................................................................................... 43
+
+XI
+
+CHAPTER ONE: INTRODUCTION
+
+1
+
+1.1 Background Study
+Question Answering (QA) systems have steadily advanced from simple keyword-based
+approaches to architectures capable of interpreting user intent and semantic meaning
+embedded in natural language. Early QA systems mostly depended on keyword matching
+methods like bag-of-words, which offered quick retrieval but struggled to capture the
+complexity of natural language (Zhang & Zhao, 2021). As natural language processing (NLP)
+matured, researchers began focusing on methods that move beyond surface forms towards
+deeper semantic understanding (Chen et al., 2021). This shift recognizes that effective QA
+requires not only finding text fragments containing similar words but also reasoning about
+concepts, relationships, and contexts.
+A notable development in this direction is the use of deep learning for answer selection.
+(Anggrayni et al., 2022) explored how bi-directional LSTMs with attention mechanisms,
+combined with vector embeddings, can represent both questions and answers in a shared
+semantic space (Anggrayni et al., 2022). Their findings showed that semantic similarity
+models outperform earlier keyword-matching techniques by better aligning retrieved answers
+with the actual intent of user queries. Such methods demonstrated improvements on
+benchmark QA datasets, showing how semantic modeling narrows the gap between user
+needs and retrieved responses (Anggrayni et al., 2022). Research on Semantic Link Networks
+(SLNs) shows that connecting ideas based on meaning can make QA systems more flexible
+and intelligent. (Xu et al., 2020) found that these networks help systems answer a wider
+variety of questions and handle complex reasoning (Xu et al., 2020). However, they also
+noted a tradeoff: while richer networks improve understanding, they require more
+computational resources (Xu et al., 2020). Overall, SLNs highlight the value of linking
+concepts, not just words, in building more robust QA systems.
+
+2
+
+Another strand of research emphasizes multi-layer semantic representation learning. (Chen et
+al., 2021) investigated how semantic representations at multiple levels can be integrated into
+QA models (Chen et al., 2021). Their work showed that incorporating layered semantic
+features leads to more accurate answer selection, particularly for context-dependent queries
+(Chen et al., 2021). This approach illustrates how deeper semantic representation supports
+greater reliability in aligning answers with question intent, offering a foundation for
+applications that demand precision.
+While these advances show clear progress in QA research, the educational domain presents
+unique challenges and opportunities. Learners often pose questions using colloquialisms,
+discipline-specific terminology, or partial formulations that differ from textbook phrasing
+(Xu et al., 2020). Traditional keyword-based retrieval, while fast, frequently produces
+voluminous or irrelevant results that do not address learners’ needs (Xu et al., 2020). In
+educational contexts, the problem is not merely retrieving documents but retrieving
+semantically appropriate and educative answers. To meet this challenge, QA research has
+turned toward education-specific tasks such as question classification.
+Despite these developments, current educational QA systems still face key limitations.
+Research by Soong et al. (2024) demonstrates that when generative models are used without
+retrieval grounding, they often produce irrelevant or misleading responses (Wu et al., 2025).
+Similar risks occur in education, where uncurated generative output may be factually
+incorrect, or inconsistent with disciplinary conventions (Wu et al., 2025). Kee et al. (2024)
+
+also emphasize how hallucinations in large language model (LLM)-based systems lower trust,
+which is particularly detrimental in educational settings where reliability is paramount (Wu et
+al., 2025). In addition, even when reliable educational materials are available, current LLMs
+cannot effectively process them in their entirety. This is due to their finite context windows,
+which limit how much text they can consider at once. When long documents like multichapter textbooks or extensive research papers exceed these limits, models lose earlier
+
+information or overlook key sections, reducing coherence and factual accuracy (Liu et al.,
+
+3
+
+2023). These limitations point to the need for QA systems that not only interpret meaning but
+also ground answers in verifiable sources while managing long, information-dense inputs
+efficiently.
+The educational field provides a ground for advancing QA technologies. Effective systems
+must accommodate diverse learners, adapt explanations to different levels of prior knowledge,
+and provide correct responses (Wu et al., 2025). They must also bridge student queries with
+trusted instructional content while avoiding the pitfalls of generic retrieval or hallucinated
+responses. An effective way to address these limitations is through Retrieval-Augmented
+Generation (RAG), which has emerged as a promising paradigm. Rather than improving
+LLMs through further training, RAG boosts their performance by combining them with
+information retrieval methods (Xu et al., 2020). Essentially, the approach retrieves relevant
+documents based on an input sequence and incorporates them as supplementary context for
+generating the output sequence (Xu et al., 2020). By combining the semantic retrieval of
+relevant content with generative models capable of producing fluent, context-sensitive
+answers, RAG integrates the precision of information retrieval with the flexibility of
+language generation (Xu et al., 2020). Recent surveys affirm that RAG systems not only
+enhance factual grounding but also help mitigate the context window constraint by
+dynamically retrieving only the most relevant text fragments rather than processing entire
+documents at once (Gupta et al., 2025). Studies in related domains confirm that retrieval
+grounding improves accuracy, contextual appropriateness, and trustworthiness of generated
+answers (Wu et al., 2025).
+For education, this integration holds particular promise. Semantic retrieval ensures that
+answers are drawn from trusted materials, while generation enables explanations to be
+tailored, elaborated, or simplified depending on learner needs (Wu et al., 2025). Intelligent
+systems could therefore provide explanations that directly target student misconceptions, and
+
+4
+
+AI assistants could synthesize domain-specific knowledge to deliver contextually appropriate
+responses that empower learner autonomy (Suwarningsih, 2020).
+
+Nonetheless, educational QA remains an open research challenge since existing systems often
+fail to provide semantically grounded explanations across disciplines (Wu et al., 2025).
+Lexical retrieval and unguided generation cannot guarantee accuracy, coherence, or relevance
+(Wu et al., 2025). Bridging this gap requires a pipeline that grounds generative responses in
+retrievable, structured sources, supports explainable reasoning, and efficiently handles the
+large scale of educational materials within the limited context windows of modern LLMs
+(Suwarningsih, 2020).
+1.2 Problem Statement
+Current large language models (LLMs) often generate responses without referencing reliable
+sources, relying solely on pre-trained data. This leads to issues of trust, accuracy, and
+relevance, as responses may not reflect up-to-date or user-specific information. Furthermore,
+while it might seem feasible to provide entire text from materials like textbooks, lecture notes,
+or research papers containing thousands of pages, directly to an LLM, this approach is limited
+by the model’s context window, which restricts how much text can be processed at once.
+When input exceeds that window, the model forgets earlier content, resulting in loss of
+important details and increased hallucination, where it produces believable but incorrect
+information. This research therefore proposes a semantic question answering system using
+retrieval-augmented AI that mitigates these issues by grounding responses in user-provided
+materials and selectively retrieving only the most relevant sections before generation,
+ensuring factual accuracy and context-aware explanations for learning and research.
+
+1.3 Aim and Objectives of the Study
+
+5
+
+Aim
+The aim of this study is to design and implement a semantic question answering system using
+retrieval-augmented AI, in order to provide accurate, explainable, and context-relevant
+answers for user consumption.
+Objectives
+To achieve this aim, the study will:
+1. Design and implement the core RAG architecture, integrating document processing,
+vector embedding generation, semantic search, and a generator component to create an
+efficient question-answering pipeline.
+2. Develop the user-facing application with key functionalities for user authentication,
+dynamic document upload and management, and an interactive chat interface that
+displays answers with source citations.
+3. Validate the system's effectiveness by achieving a minimum score of 80% on a
+Faithful Accuracy metric, which requires answers to be both factually correct and fully
+grounded in the retrieved source material.
+1.4 Significance of the Study
+The significance of this study lies in addressing the twin challenges of factual reliability and
+limited context capacity in large language models. Current AI models often generate
+responses without verifiable grounding in reliable sources, leading to issues of trust and
+accuracy. Additionally, while educational materials such as textbooks, lecture notes, and
+research papers may contain thousands of pages, these cannot be processed in their entirety
+due to the finite context windows of language models. This creates a practical barrier where
+complete documents exceed what models can consider at once, resulting in loss of
+information and reduced answer quality.
+
+6
+
+By integrating retrieval-based grounding, the system enables learners and educators to obtain
+verifiable, context-aware explanations drawn from their own materials. The RAG-based
+approach ensures that responses remain connected to user-provided sources while
+strategically managing context limitations through selective retrieval of only the most
+relevant sections. This makes the tool particularly valuable for independent study, as it
+
+delivers reliable responses that maintain direct relevance to user content without requiring the
+model to process entire documents. The research advances AI development by creating
+systems that solve real-world educational needs while working within the practical
+constraints of current language model architectures.
+
+1.5 Scope and Limitations of the Study
+Scope
+This study focuses on the design and implementation of a question-answering system using
+retrieval-augmented AI. The system is limited to integrating retrieval and generation
+components that manage the constraints of large language models’ context windows by
+selectively fetching relevant content instead of processing entire documents. The study does
+not involve training or fine-tuning large language models; instead, it leverages existing GPTbased models to evaluate how effectively retrieval augmentation improves contextual
+grounding, factual accuracy, and relevance within user-provided learning materials.
+Limitations
+This study is subject to several methodological and technical constraints that define its scope
+and applicability. The system relies on OpenAI's pre-trained GPT models without fine-tuning,
+meaning response quality depends entirely on the model's inherent capabilities and the
+relevance of retrieved context rather than domain-specific optimization. The effectiveness of
+answer generation is bounded by the retrieval mechanism's accuracy, as irrelevant or
+incomplete retrieval directly compromises response quality since the generative model cannot
+compensate for missing or misaligned context.
+
+This study addresses context window limitations through selective retrieval rather than
+
+7
+
+architectural modifications to the language model itself. Alternative approaches such as finetuning, prompt engineering techniques, or hierarchical context management strategies fall
+outside the research scope. The system processes only text-based documents in PDF formats,
+meaning educational materials containing diagrams, mathematical notation, tables, or images
+are either excluded or processed without their visual components, potentially losing critical
+information. While the system architecture supports future expansion to multimodal inputs,
+this capability is not explored in the current study.
+The study operates within the constraints of OpenAI API rate limits, token quotas, and cloud
+hosting capabilities. These infrastructure dependencies limit the scale of experiments, the
+volume of concurrent users that can be tested, and the comprehensiveness of performance
+benchmarking. System assessment is conducted using text-based educational datasets within
+a controlled environment, meaning performance characteristics under high-concurrency
+scenarios or across multiple subject domains simultaneously remain unexamined.
+1.6 Research Questions
+1. How can a retrieval-augmented generation architecture be designed to effectively integrate
+semantic retrieval with language model generation for question answering in educational
+contexts?
+2. To what extent does grounding language model responses in user-provided educational
+materials improve the accuracy, relevance, and trustworthiness of generated answers
+compared to ungrounded generation?
+3. What are the key technical and architectural considerations for implementing a RAG-based
+system that addresses the context window limitations of large language models while
+maintaining response quality?
+
+CHAPTER TWO: LITERATURE REVIEW
+
+8
+
+2.1 Introduction
+This chapter reviews existing literature relevant to semantic question answering and retrievalaugmented generation (RAG). The purpose is to establish the foundation for the study by
+examining how question answering (QA) systems have evolved, the role of semantic methods
+in improving accuracy, and how retrieval-augmented techniques address the limitations of
+large language models (LLMs). The review also considers the application of QA in education,
+where curriculum alignment, explainability, and learner trust are critical.
+The chapter is organized thematically. It begins with an overview of the historical
+development of QA systems, from early keyword-based methods to modern transformerbased architectures. It then explores semantic approaches that aim to capture meaning beyond
+surface word matching, followed by a detailed discussion of RAG as a promising paradigm
+for grounding generative models in reliable sources. Attention is also given to how QA has
+been applied in educational contexts, highlighting both opportunities and persistent
+challenges. Evaluation methods, including standard benchmarks and human-centered criteria,
+are also reviewed to understand how QA performance is measured. Finally, research gaps are
+identified to show where current work falls short and how this study seeks to contribute.
+2.2 Evolution of Question Answering Systems
+Context-setting Question Answering (QA) has evolved through a sequence of paradigm shifts,
+each driven by advances in representation, data, and evaluation methodologies. Early work in
+QA was grounded in information retrieval (IR) and lightweight lexical matching, where the
+objective was to locate snippets containing potential answers rather than understand the
+meaning of the question. This retrieval-centric nature laid the groundwork for assessing QA
+systems in practical settings, as reflected in established evaluation tracks that emphasized
+extracting precise answer spans from text rather than returning broad document lists
+(Voorhees, 2001). Over time, natural language processing (NLP) techniques began to
+
+contribute more directly to QA by enabling syntactic and basic semantic interpretation. The
+
+9
+
+shift toward machine learning (ML) and deep learning (DL) introduced data-driven
+representations such as word embeddings and neural architectures that could learn to map
+questions to passages and infer correct answers from context (Kazemi et al., 2022). As the
+volume and diversity of QA data grew, neural models demonstrated superior performance,
+yet their success depended critically on data availability, generalization, and the handling of
+reasoning beyond lexical cues (Kazemi et al., 2022). More recently, transformer-based
+architectures have emerged as a dominant force in QA systems, offering rich contextual
+representations and flexible conditioning on both questions and documents, these models
+have driven substantial gains in reading comprehension while simultaneously raising
+concerns about issues like hallucination (Tran et al., 2023). The progression from keywordbased systems to ML/DL and then to transformer-based QA illustrates a broad trajectory:
+increasing emphasis on meaning, context, and end-to-end learning, with ongoing concerns
+about reliability and interpretability. Taken together, these developments suggest that while
+keyword and purely linguistic approaches provided a solid foundation for early QA, current
+goals demand semantic grounding, good reasoning, and explicit alignment between user
+intent and retrieved knowledge (Kazemi et al., 2022; Tran et al., 2023).
+2.2.1 Keyword-Based and Information Retrieval Approaches
+Keyword-based and information retrieval approaches in the initial era of QA systems
+predominantly relied on information retrieval techniques that treated questions as lexical
+patterns to be matched against text. The primary objective was to retrieve passages likely to
+contain the answer, from which a human or an automated post-processing step would extract
+the exact span of words. This retrieval-centric mindset was formalized and evaluated through
+community-driven benchmarks such as the Text REtrieval Conference (TREC) QA track,
+which emphasized retrieving small snippets of text that answer the question rather than
+returning long document lists (Voorhees, 2001). The emphasis on text snippets as the unit of
+
+10
+
+answer was instrumental in shaping early QA evaluation and in highlighting the limitations of
+purely lexical matching, including difficulty with recognizing different word forms and
+limited ability to handle synonyms or rephrased expressions (Voorhees, 2001).
+2.2.2 NLP-Driven QA
+The NLP-driven stage of QA introduced more sophisticated linguistic processing to interpret
+questions and locate relevant information. Parsing, part-of-speech tagging, named entity
+recognition, and shallow semantic representations were deployed to bridge the gap between
+surface form and intended meaning, enabling QA systems to encode syntactic and some
+semantic cues about both questions and potential answer passages (Tran et al., 2023). Early
+attempts in this phase sought to interpret natural language more directly, moving beyond
+monolithic keyword matching toward structured representations that could support more
+nuanced matching and inference. This transition reflected a growing recognition that
+language understanding, at least to a moderate depth, could be achieved through statistical
+NLP techniques, with hand-crafted features and probabilistic models guiding the alignment
+between question structure and textual evidence (Tran et al., 2023). While NLP-driven QA
+yielded improvements over pure IR, the depth of meaning captured remained constrained by
+relatively shallow semantics, limited world knowledge, and the absence of robust reasoning
+capabilities. The resulting systems often performed well on limited datasets or well-defined
+question types but struggled with questions requiring inference across multiple sentences or
+documents (Tran et al., 2023). In this era, progress depended on advances in linguistic
+annotation, parsing accuracy, and feature engineering to shape the inputs to downstream QA
+
+modules, rather than on fully end-to-end learning of question-to-answer mappings (Tran et al.,
+2023). The literature indicates that NLP-driven QA brought a significant shift toward
+interpretable linguistic signals and structured inference, but also highlighted persistent gaps in
+understanding nuanced intent and grounding answers in broader knowledge contexts (Tran et
+al., 2023; Zhang et al., 2022). This phase set the stage for a data-driven intensification, where
+machine learning would begin to automate feature extraction and inference in QA, ultimately
+
+enabling more scalable and generalizable systems as annotated data became more abundant
+
+11
+
+(Kazemi et al., 2022). Overall, NLP-driven QA marked a critical transition from shallow
+lexical matching to more language-aware processing, while still grappling with limitations in
+deep semantic understanding and robust reasoning in the absence of large, diverse training
+data (Tran et al., 2023; Zhang et al., 2022).
+2.2.3 Machine Learning and Deep Learning in QA
+The ML and DL era transformed QA by adopting distributed representations of words and
+sentences, enabling models to learn semantic relationships from large corpora. Word
+embeddings such as Word2Vec provided continuous vector representations that captured
+distributional semantics, enabling better similarity judgments and more flexible matching
+beyond exact lexical overlap (Kazemi et al., 2022). This shift toward continuous
+representations laid the groundwork for neural architectures to learn end-to-end mappings
+from questions to passages and to predict exact answer spans within text. Recurrent neural
+networks (RNNs), long short-term memory networks (LSTMs), and convolutional neural
+networks (CNNs) became popular choices for QA tasks, offering the ability to encode
+sequences and hierarchical features that static lexical models could not capture (Kazemi et al.,
+2022). These DL models achieved notable performance gains on reading comprehension
+benchmarks (Kazemi et al., 2022). The literature also emphasizes that DL-based QA systems
+require substantial annotated data to achieve robust generalization, a requirement that has
+driven efforts in data collection, synthetic data generation, and domain adaptation to mitigate
+data scarcity in low-resource settings (Kazemi et al., 2022). Empirical results in ML/DL QA
+demonstrated clear advantages in representing linguistic context, enabling more nuanced
+question understanding and more accurate extraction of evidence, while still highlighting
+struggles in robust, multi-hop reasoning and explainability (Kazemi et al., 2022; Zhang et al.,
+2022). The machine learning advancement marked a decisive evolution from pattern-based
+and linguistically engineered features toward data-driven, representation-rich QA systems,
+
+12
+
+but it also exposed the necessity for grounding and interpretability in complex QA scenarios
+(Kazemi et al., 2022; Zhang et al., 2022). Across this period, ML/DL QA benefited from
+improved corpora, pretraining techniques, and transfer learning, enabling cross-domain QA
+and more flexible adaptation to new languages and topics (Kazemi et al., 2022; Tran et al.,
+2023). The advantages of neural architectures were clear like capturing nuanced semantics,
+handling variable-length input, and learning from context, but researchers increasingly
+recognized the need to combine learning with explicit reasoning and retrieval strategies to
+
+answer questions that require information spread across documents (Tran et al., 2023; Zhang
+et al., 2022). In this light, the ML/DL phase did not merely outperform prior approaches; it
+also revealed the limitations of purely data-driven reasoning and motivated integration with
+retrieval and structured reasoning components to support more reliable QA (Zhang et al.,
+2022).
+2.2.4 Transformer-Based QA
+The most recent wave in QA uses transformer-based architectures, which provide powerful
+contextual representations and scalable, end-to-end learning for question answering.
+Transformer models enable rich conditioning on the entire text context and the question,
+allowing for nuanced understanding of meaning, long-range dependencies, and implicit world
+knowledge encoded in pretraining data (Kazemi et al., 2022; Tran et al., 2023). In the
+literature, there is an explicit shift toward neural network models with strong performance in
+machine reading comprehension and open-domain QA, driven by the capacity of
+transformers to model complex linguistic patterns and to leverage large-scale unsupervised
+pretraining followed by task-specific fine-tuning (Tran et al., 2023). This transition has
+accompanied substantial empirical gains, including improved ability to identify relevant
+evidence across documents, disambiguate questions, and generate coherent, contextually
+grounded answer outputs (Tran et al., 2023). Nevertheless, transformer-based QA is not
+without challenges: hallucinations and unsupported answer generation can arise when the
+model lacks reliable grounding in the retrieved passages, highlighting the need for robust
+
+13
+
+grounding, evidence verification, and retrieval-augmented generation approaches (Tran et al.,
+2023). Empirical work further shows that the quality of QA heavily depends on high-quality
+data and appropriate alignment between question intent and retrieved content, reinforcing the
+importance of domain-adaptive training and curated evaluation suites (Kazemi et al., 2022).
+In parallel, studies of low-resource and multilingual settings underscore the value of
+architectures that can transfer knowledge across languages and domains, while also
+illustrating the difficulties of maintaining performance when training data are scarce or
+unevenly distributed (Tran et al., 2023). The transformer era thus represents a paradigm shift
+toward end-to-end, context-aware QA systems, while also foregrounding essential research
+challenges in grounding, reliability, and interpretability, particularly in open-domain
+scenarios (Kazemi et al., 2022; Tran et al., 2023). Within this context, a recurring theme is
+the integration of retrieval with generation or answer extraction to improve grounding and
+reduce the chance for hallucinations in transformer-based QA models (Tran et al., 2023). The
+central narrative is that transformer-based QA delivers strong contextual understanding and
+adaptability but requires careful architectural design and evaluation to ensure reliability and
+accuracy to source content (Tran et al., 2023). The culmination of these trends is a QA
+landscape in which performance arises from pipelines that couple powerful contextual
+
+models with retrieval strategies, explicit reasoning modules, and human-grounded evaluation,
+rather than from isolated improvements in any single component (Voorhees, 2001; Zhang et
+al., 2022).
+
+2.3 Semantic Approaches in QA
+The progression from keyword-based retrieval to semantic understanding represents a
+fundamental shift in how QA systems interpret and match questions with relevant
+information. Rather than relying solely on lexical overlap between queries and documents,
+semantic approaches attempt to capture the underlying meaning and conceptual relationships
+within text. This transition was motivated by the recognition that effective question
+
+answering requires understanding not just what words appear in a question, but what the
+
+14
+
+question actually means and how that meaning relates to potential answers in the knowledge
+base. The limitations of keyword matching like its inability to handle synonyms, paraphrases,
+and implicit semantic relationships, drove researchers toward representation learning methods
+that could encode meaning in continuous vector spaces. These semantic methods have proven
+particularly valuable in educational contexts, where learners may express the same
+conceptual question using different terminologies, and where understanding the intent behind
+a query is essential for providing appropriate explanatory responses.
+2.3.1 Embeddings for Semantic Representations
+The development of distributed word representations marked a major advancement in
+semantic QA, enabling systems to move beyond surface-level word matching toward
+meaning-based similarity. Word embeddings such as Word2Vec and GloVe introduced the
+concept of mapping words into continuous vector spaces where semantically similar terms
+occupy nearby positions, allowing QA systems to recognize that "car" and "automobile" or
+"large" and "big" convey related meanings despite differing lexically. These embeddings are
+learned from large text corpora through techniques that capture distributional semantics
+which is the principle that words appearing in similar contexts tend to have related meanings.
+In QA applications, word embeddings enable more flexible matching between question terms
+and answer candidates, improving retrieval precision when queries use different vocabulary
+than the source documents.
+Building on static word embeddings, contextual embeddings introduced by transformer-based
+models like BERT and GPT represent a significant leap in semantic representation quality.
+Unlike Word2Vec or GloVe, which assign a single vector to each word regardless of context,
+contextual embeddings generate different representations for the same word depending on its
+surrounding text. This context sensitivity proves crucial for QA tasks where word meaning
+depends heavily on usage, for instance, distinguishing "bank" as a financial institution versus
+
+15
+
+a river bank. Karpagam et al. (2020) demonstrated that bidirectional LSTM models combined
+with attention mechanisms over embedded representations significantly outperform keywordbased approaches on benchmark datasets, showing how semantic modeling narrows the gap
+between user intent and system responses. These contextual representations form the
+foundation for modern semantic QA systems, enabling them to understand questions and
+match them to relevant content based on meaning rather than mere word overlap.
+2.3.2 Semantic Similarity Search
+
+Once questions and answers are represented as embeddings, the next challenge is determining
+which answers are most relevant to a given question. Semantic similarity search addresses
+this by measuring how close question and answer representations are in the vector space,
+rather than simply counting matching keywords. In this approach, both questions and
+candidate answers are encoded as vectors, and the system computes similarity scores,
+typically using measures like cosine similarity or dot products to identify which answers are
+semantically closest to the question. This fundamentally differs from keyword-based retrieval,
+which only recognizes relevance when the same words appear in both question and answer.
+The key advantage of semantic similarity search is its ability to match questions with relevant
+answers even when they use completely different wording. For example, if a student asks
+"What causes rain?" and a textbook passage explains "Precipitation occurs when water vapor
+condenses," a keyword system would miss this match entirely. However, a semantic
+similarity approach can recognize that these express related concepts because their
+embeddings are close together in the vector space. This capability proves particularly
+valuable in educational settings, where students often phrase questions informally or use
+different terminology than their course materials.
+The literature confirms that measuring semantic similarity in vector space leads to more
+accurate answer retrieval than traditional methods. By computing how close question and
+
+answer embeddings are to each other, systems can rank potential answers based on
+
+16
+
+conceptual relevance rather than surface-level word matching.
+2.3.3 Multi-Layer Representations
+Advanced semantic QA systems leverage multi-layer representations that capture meaning at
+different levels of linguistic abstraction, from syntactic structure to high-level semantics.
+Yuan and Chen (2020) investigated how integrating representations from multiple semantic
+layers like syntactic features, distributional embeddings, and task-specific encodings
+improves answer selection accuracy. Their work demonstrated that models incorporating
+layered semantic features achieve better performance on nuanced or context-dependent
+queries compared to single-level representations, particularly for questions requiring
+inference across multiple sentences or conceptual domains. This multi-layer approach reflects
+the understanding that effective semantic representation requires capturing both local
+linguistic patterns and global conceptual relationships, as different layers of abstraction
+provide complementary signals for matching questions to answers.
+Modern transformer-based architectures, like OpenAI's GPT-4 models, exemplify this multilayer paradigm through their deep neural architectures comprising dozens of transformer
+layers. Each layer in these models processes increasingly abstract representations: early
+layers capture lexical and syntactic patterns, middle layers encode semantic relationships and
+contextual dependencies, while deeper layers perform high-level reasoning and conceptual
+integration. This hierarchical processing enables models like GPT-4 to handle complex
+educational queries that demand understanding at multiple linguistic levels simultaneously.
+Yuan and Chen (2020) emphasized that incorporating diverse semantic features at multiple
+layers leads to more reliable answer selection, offering a foundation for applications that
+demand both accuracy and interpretability. However, the literature acknowledges a persistent
+tradeoff: deeper semantic modeling yields better contextual understanding and more accurate
+results, but requires more sophisticated architectures and greater computational resources.
+
+Despite this cost, multi-layer representations have become essential for handling the full
+
+17
+
+complexity of natural language meaning in contemporary QA systems, particularly in
+educational contexts where questions often require reasoning across conceptual domains and
+inferring connections between disparate pieces of information.
+While semantic models improve contextual matching and enable more flexible retrieval
+based on meaning rather than keywords, they still do not inherently ensure factual grounding
+or prevent the generation of plausible but unsupported answers. Even sophisticated
+embedding-based systems can retrieve semantically similar but factually incorrect content,
+and generative models can produce fluent responses that lack grounding in authoritative
+sources. This limitation has led researchers toward retrieval-augmented generation methods
+that explicitly combine semantic retrieval with constrained generation using an existing large
+language model, ensuring that system outputs are not only semantically coherent but also
+verifiably grounded in retrieved evidence.
+2.4 Retrieval-Augmented Generation
+The limitations of purely generative language models particularly their tendency to produce
+information but unverified responses have motivated the development of retrieval-augmented
+generation (RAG) as a hybrid approach that addresses the hallucination problem by
+grounding generation in retrieved evidence. RAG represents a paradigm shift in how
+language models access and utilize external knowledge, combining the precision of
+information retrieval with the fluency and adaptability of neural language generation. This
+section reviews the conceptual foundations of RAG, examines specific implementations
+across various domains, and analyzes how these systems have been applied to educational
+contexts.
+
+2.4.1 Conceptual Foundations of RAG
+
+18
+
+Lewis et al. (2020) introduced the foundational RAG architecture that combines a neural
+retriever with a pre-trained sequence-to-sequence model, demonstrating that retrievalaugmented models achieve state-of-the-art results on knowledge-intensive NLP tasks while
+providing more factually accurate outputs than purely parametric approaches. Their work
+established the core RAG paradigm: given an input query, the system retrieves relevant
+documents from a knowledge base and conditions the generative model on both the query and
+retrieved context to produce grounded responses. This architecture addressed a fundamental
+limitation of large language models which is their reliance on static parametric knowledge
+that cannot be easily updated or verified by enabling dynamic access to external knowledge
+sources during inference.
+The retrieval component in RAG systems typically employs dense retrieval methods using
+learned embeddings, where both queries and documents are encoded into a shared vector
+space that captures semantic similarity beyond lexical overlap. Karpukhin et al. (2020)
+demonstrated that dense passage retrieval using bi-encoders trained on question-answer pairs
+substantially outperforms traditional sparse retrieval methods like BM25 for open-domain
+question answering, achieving higher recall while maintaining computational efficiency
+through approximate nearest neighbor search. Their Dense Passage Retrieval (DPR) approach
+became foundational for many subsequent RAG implementations, showing that learned dense
+representations enable more accurate semantic matching between queries and relevant
+passages than keyword-based methods.
+2.4.2 RAG Implementations Across Domains
+The application of RAG has been explored across diverse domains, each revealing specific
+architectural considerations and implementation challenges. Asai et al. (2023) developed a
+self-RAG framework that enhances language model generation through retrieval and self-
+
+19
+
+reflection, introducing mechanisms for the model to decide when retrieval is necessary and to
+critique its own outputs using reflection tokens. Their system demonstrated that teaching
+models to selectively retrieve and critically evaluate retrieved passages improves both factual
+accuracy and citation quality across diverse tasks, though at the cost of increased
+computational overhead and generation latency. This work highlighted a critical trade-off in
+RAG systems: while more sophisticated retrieval and reflection mechanisms improve output
+quality, they also increase system complexity and response time.
+In the medical domain, Soong et al. (2024) investigated RAG for biomedical question
+answering, comparing GPT-3.5 and GPT-4 with and without retrieval augmentation using
+PubMed abstracts as the knowledge source. Their results showed that RAG substantially
+reduced factually incorrect responses from 46% error rates in ungrounded GPT-3.5 to 23%
+with retrieval augmentation while also improving the clinical relevance and specificity of
+generated answers. However, they identified persistent challenges: retrieval quality directly
+determined the upper bound on answer accuracy, and the system struggled when relevant
+information was distributed across multiple documents rather than contained in a single
+passage. These findings underscore the retrieval bottleneck in RAG systems, if relevant
+information is not retrieved, even sophisticated generators cannot produce correct responses.
+
+Xiong et al. (2024) explored RAG for long-form question answering, developing systems that
+retrieve multiple passages and synthesize information across them to generate comprehensive
+answers. Their work revealed architectural challenges in managing multiple retrieved
+passages: the system must determine relevance, resolve contradictions, maintain coherence
+across diverse sources, and attribute specific claims to appropriate sources. They found that
+simply concatenating retrieved passages as context often led to incoherent generation,
+particularly when passages contained conflicting information or varied significantly in
+writing style. To address this, they developed iterative retrieval strategies where the model
+retrieves initial passages, generates a partial response, and then retrieves additional passages
+
+20
+
+based on identified knowledge gaps which is a computationally expensive but more effective
+approach for complex questions requiring synthesis across multiple sources.
+2.4.3 RAG in Educational Contexts
+The application of RAG to educational question answering has received increasing attention,
+
+though implementations remain relatively limited compared to general-domain QA. Liu et al.
+(2024) specifically investigated textbook question answering using RAG, proposing a
+framework that combines dense retrieval over textbook chapters with GPT-based generation
+to answer student questions grounded in course materials. Their system indexed textbook
+content at the paragraph level, used a fine-tuned DPR model for retrieval, and instructed
+GPT-4 to generate answers strictly based on retrieved passages while citing specific textbook
+sections. Evaluation on a dataset of college-level biology questions showed that RAG
+improved answer accuracy by 34% compared to ungrounded GPT-4, with particularly strong
+gains on factual recall questions. However, the system performed poorly on questions
+requiring multi-step reasoning across chapters or integration of information from figures and
+diagrams, content types their text-only retrieval could not effectively handle.
+Yan et al. (2024) surveyed applications of large language models in education more broadly,
+highlighting RAG as a promising approach for creating personalized learning assistants that
+ground explanations in curriculum-aligned materials. They noted that while LLMs
+demonstrate impressive general reasoning capabilities, their application in education requires
+mechanisms to ensure factual accuracy, curriculum alignment, and appropriate pedagogical
+framing which are requirements that RAG's grounding in authoritative sources helps address.
+However, they identified significant gaps in existing educational RAG systems: most operate
+over fixed textbook corpora rather than supporting user-uploaded materials, lack mechanisms
+for adapting explanation complexity to learner level, and provide limited explainability
+regarding how retrieved passages informed generated answers.
+
+Swacha and Gracel (2025) conducted a comprehensive survey of RAG-based chatbots in
+
+21
+
+education, categorizing systems by their knowledge sources, retrieval strategies, and
+pedagogical approaches. They found that most educational RAG implementations use
+relatively simple retrieval strategies like semantic similarity search over pre-chunked
+documents without sophisticated mechanisms for query expansion, retrieval ranking, or
+handling ambiguous questions. Common limitations included: difficulty with questions
+requiring synthesis across multiple documents, limited support for multimedia educational
+content, absence of curriculum-specific retrieval strategies, and lack of evaluation
+frameworks measuring pedagogical effectiveness beyond factual accuracy. They emphasized
+that educational RAG systems must balance competing objectives like factual correctness,
+pedagogical appropriateness, engagement, and accessibility, creating design challenges
+distinct from general-domain QA.
+2.4.4 Technical and Architectural Considerations
+Recent research has identified several technical challenges in RAG implementation that are
+particularly relevant to educational applications. Barnett et al. (2024) analyzed the retrieval
+bottleneck in RAG systems, demonstrating through controlled experiments that retrieval
+quality establishes a hard upper bound on generation quality, even state-of-the-art language
+models cannot overcome poor retrieval. They found that retrieval failures stem from multiple
+sources: semantic mismatch between query phrasing and document language, inadequate
+chunking strategies that split relevant information across passages, and insufficient contextual
+information in indexed passages to support accurate similarity matching. Their work
+highlighted the critical importance of chunking strategy in RAG systems: while smaller
+chunks enable more precise retrieval, they risk fragmenting contextual information; larger
+chunks preserve context but reduce retrieval precision and may exceed context window limits
+when multiple passages are retrieved.
+
+22
+
+The context window management challenge has been examined by several researchers. Liu et
+al. (2023) demonstrated that language models exhibit a "lost in the middle" phenomenon
+where they preferentially attend to information at the beginning and end of long contexts,
+often missing critical information in the middle even when it is relevant to the query. This
+finding has direct implications for RAG: simply concatenating multiple retrieved passages
+may not ensure the model effectively uses all retrieved information, particularly when many
+passages are retrieved or when the most relevant information appears in middle-ranked
+passages. They suggested architectural modifications such as re-ranking retrieved passages
+based on query relevance and strategically positioning the most relevant passages at the
+beginning or end of the context window.
+Shuster et al. (2021) investigated knowledge grounding in dialogue systems, examining how
+language models balance retrieved information against their parametric knowledge. They
+found that models sometimes ignore or contradict retrieved passages when those passages
+conflict with the model's pre-trained knowledge, even when explicitly instructed to rely on
+retrieved context. This behavior poses risks in educational settings where curriculum-specific
+information may differ from general knowledge in the model's training data. Their
+experiments suggested that stronger grounding requires explicit architectural mechanisms
+such as constraining generation to derive from retrieved passages or using separate retrieval
+and generation scores to detect when models deviate from provided context.
+2.4.5 Limitations of Current RAG Approaches
+Despite substantial progress, current RAG implementations exhibit several limitations that
+motivate the present study. First, most systems operate over fixed, pre-indexed document
+collections rather than supporting dynamic document upload by end users. This limits their
+
+applicability to personalized learning scenarios where students work with their own textbooks,
+lecture notes, and materials. Second, chunking and indexing strategies remain largely
+
+23
+
+domain-agnostic, treating educational materials like general documents rather than leveraging
+the inherent structure of textbooks, lecture slides, and academic papers.
+Third, evaluation of RAG systems has focused primarily on factual accuracy metrics rather
+than pedagogical effectiveness criteria such as explanation clarity, conceptual correctness,
+
+and learner comprehension. Liu et al. (2024) noted that existing benchmarks measure whether
+systems produce factually correct answers but do not assess whether explanations are
+pedagogically appropriate for the target learner population. Finally, computational costs and
+latency remain practical barriers to deployment: RAG introduces overhead from retrieval
+operations, and serving multiple concurrent users requires significant infrastructure
+investment which are challenges that are particularly acute in educational contexts where
+systems must be accessible to individual learners without institutional resources.
+These limitations reveal that while RAG offers a promising paradigm for grounding
+educational QA, substantial gaps remain in translating the approach into practical, useraccessible systems that support personalized learning with user-provided materials. The
+present study addresses these gaps by implementing a RAG-based system that enables
+document upload and evaluates both factual accuracy and answer grounding in educational
+contexts.
+2.5 QA in the Educational Domain
+The application of question answering systems in educational settings presents unique
+challenges that extend beyond technical accuracy. Educational QA must accommodate
+diverse learner backgrounds, align with curriculum objectives, provide pedagogically
+appropriate explanations, and build learner trust through reliable responses. Students often
+pose questions using informal language and varying levels of conceptual understanding,
+creating vocabulary gaps that systems must bridge while maintaining instructional
+appropriateness. Additionally, the scale of educational materials presents a fundamental
+
+technical challenge: comprehensive textbooks and lecture notes often contain hundreds or
+
+24
+
+thousands of pages that exceed the context windows of large language models, making it
+impossible to process these materials in their entirety without loss of information (Liu et al.,
+2023).
+2.5.1 Challenges in Educational QA
+Educational question answering faces several interconnected challenges that distinguish it
+from general-domain QA. First, curriculum alignment requires that responses be both
+factually correct and pedagogically appropriate for the learner's level (Yan et al., 2024).
+Second, question diversity and ambiguity pose significant challenges as students often phrase
+questions informally or incompletely. Third, conceptual reasoning demands that systems go
+beyond surface-level keyword matching to understand underlying concepts and relationships
+(Chen et al., 2021). Fourth, personalization necessitates that explanations be tailored to
+individual learner needs (Suwarningsih, 2020). Finally, trust and reliability are paramount:
+inaccurate or misleading responses can reinforce misconceptions and undermine learning
+outcomes (Wu et al., 2025).
+2.5.2 Existing Educational QA Systems
+Various non-RAG approaches have been developed to address educational QA. Intelligent
+Tutoring Systems (ITS) use AI to provide personalized instruction through domain models
+(representing subject matter knowledge), student models (tracking learner progress), and
+pedagogical models (determining instructional strategies) (Suwarningsih, 2020). These
+systems have demonstrated effectiveness in K-12 and higher education, particularly for welldefined domains like mathematics and programming. However, ITS implementations often
+struggle with open-ended questions, require extensive domain engineering, and face
+challenges in scaling across diverse subject areas.
+
+25
+
+Traditional rule-based educational QA systems rely on carefully constructed knowledge bases
+and reasoning engines to answer student questions. While these approaches offer
+explainability and predictable behavior, they lack flexibility in handling natural language
+variation and require significant manual effort to develop and maintain domain-specific rules
+(Zhang & Zhao, 2021).
+2.5.3 Limitations Motivating RAG Adoption
+Current non-RAG educational QA approaches exhibit critical limitations that motivate the
+shift toward retrieval-augmented generation. First, lack of grounding in user-specific content
+represents a fundamental gap: most systems operate over fixed knowledge bases rather than
+the specific textbooks and materials that students actually use, creating misalignment with
+course terminology and frameworks (Yan et al., 2024). Second, insufficient adaptability
+persists as rule-based and traditional ITS systems cannot easily accommodate new content or
+respond flexibly to diverse question formulations (Zhang & Zhao, 2021). Third, hallucination
+and factual errors remain problematic in purely generative LLM-based systems without
+retrieval grounding (Wu et al., 2025). Finally, scalability and accessibility challenges limit
+deployment: systems requiring extensive setup, domain engineering, or computational
+resources may not be practical for individual learners (Suwarningsih, 2020).
+These limitations motivate the adoption of RAG-based approaches that can ground responses
+in user-uploaded educational materials, provide verifiable source attribution, and leverage
+accessible cloud-based APIs to support diverse learners (Swacha & Gracel, 2025). The
+integration of retrieval mechanisms with generative models offers a pathway to address the
+unique requirements of educational QA while maintaining flexibility and accessibility.
+
+2.6 Research Gaps Identified
+
+26
+
+The literature review reveals critical gaps in the implementation and evaluation of retrievalaugmented generation for educational question answering. The following three gaps motivate
+the present study's approach to developing a RAG-based system for user-provided documents.
+1. The Dynamic Personalization Gap: Current educational RAG systems
+predominantly operate over fixed, pre-indexed textbook collections (Liu et al., 2024;
+Swacha & Gracel, 2025), limiting their application in personalized learning scenarios
+where students need to query their own specific materials, such as lecture notes or
+research papers. This study addresses this gap by implementing a system that supports
+dynamic user upload, indexing, and querying of personal document collections.
+2. The Retrieval Transparency Gap: While retrieval quality is a known bottleneck
+(Barnett et al., 2024), existing educational RAG systems often function as "black boxes,"
+providing generated answers without visibility into the retrieved evidence that informed
+them (Swacha & Gracel, 2025). This lack of transparency hinders user trust and the
+ability to diagnose errors. This study addresses this gap by implementing explicit source
+attribution, allowing users to verify the grounding of every AI-generated answer.
+3. The Pedagogical Faithfulness Gap: Evaluations of educational QA systems focus
+heavily on factual accuracy but often neglect to measure the faithfulness of answers to
+the provided source material (Liu et al., 2024). A factually correct answer that is not
+grounded in the retrieved context is less valuable for curriculum-aligned learning. This
+study addresses this gap by explicitly evaluating the extent to which generated answers
+remain faithful to the user-uploaded documents, a key metric for reliability in educational
+settings.
+
+2.7 Summary
+
+27
+
+This chapter reviewed literature on semantic question answering and retrieval-augmented
+generation. The review traced QA evolution from keyword-based retrieval to transformerbased architectures, showing increasing emphasis on semantic understanding alongside
+persistent challenges in grounding and reliability. Semantic approaches using embeddings
+and multi-layer representations enable meaning-based matching beyond keyword overlap.
+RAG emerged as a solution to hallucination by grounding generation in retrieved evidence,
+offering verifiable attribution and reduced errors, though facing retrieval bottlenecks and
+computational overhead.
+Educational QA presents unique challenges including curriculum alignment, question
+diversity, conceptual reasoning demands, context window limitations when processing
+extensive materials, and trust requirements. Existing approaches like Intelligent Tutoring
+Systems and LLM-based assistants exhibit limitations such as lack of user-specific content
+grounding and hallucination risks. Two research gaps were identified: limited documentation
+of end-to-end RAG implementation for educational materials and insufficient understanding
+of how retrieval quality affects answer faithfulness in educational contexts.
+The present study contributes to addressing these gaps by implementing a RAG-based QA
+system, evaluating answer grounding and faithfulness to source materials, and documenting
+implementation approaches and limitations. The next chapter details the methodology for
+designing, implementing, and evaluating this system.
+
+CHAPTER THREE: METHODOLOGY
+
+28
+
+3.1 Introduction
+This chapter outlines the methodology for developing a retrieval-augmented AI system. It
+covers the project’s feasibility assessment, system requirements, architectural design, and the
+rationale for technology selection. The chapter provides a structured overview of how
+conceptual foundations were translated into an implementable system.
+3.2 Feasibility Study
+A feasibility study evaluated the system’s practicality across technical, economic, and
+operational dimensions to ensure it could be developed and deployed within available
+resources and expertise.
+3.2.1 Technical Feasibility
+The project is technically feasible based on the following considerations:
+1. Available Technologies: The system employs established tools such as NestJS,
+PostgreSQL, ChromaDB, and OpenAI models, all of which are stable, welldocumented, and widely supported.
+2. Developer Expertise: The required skills like TypeScript, RESTful API design,
+database management, and AI integration align with the developer’s skills, supported
+by extensive documentation and learning resources.
+3. Infrastructure: Cloud-based platforms like Vercel and Neon offer reliable,
+scalable, and cost-effective hosting for the application, database, and AI components.
+3.2.2 Economic Feasibility
+The system is economically viable due to minimal development and operational costs:
+
+1.
+
+Development Costs: Core technologies (NestJS, PostgreSQL, ChromaDB) are
+open-source, eliminating licensing expenses. The primary investment is developer
+time.
+
+2.
+
+Operational Costs: Costs remain low. The OpenAI API follows a usage-based
+model, while hosting on Vercel’s free tier provides adequate resources for
+development and low-traffic deployment.
+
+3.2.3 Operational Feasibility
+The system is operationally practical and user-oriented:
+1.
+
+Accessibility: The application runs on modern web browsers without requiring
+additional installations.
+
+2.
+
+Ease of Use: A chat-based interface with document upload and simple
+authentication ensures an intuitive experience.
+
+3.
+
+Maintenance: A modular architecture minimizes maintenance efforts.
+
+4.
+
+Deployment: Cloud deployment enables effortless updates, scalability, and
+continuous availability.
+
+3.3 System Requirements
+This section outlines the system’s functional and non-functional requirements, which define
+what the proposed retrieval-augmented AI platform must achieve and the standards it must
+meet in performance, security, and maintainability.
+3.3.1 Functional Requirements
+The system is expected to perform the following core functions:
+1. Support user authentication through email-based magic links and Google OAuth
+2.0.
+
+29
+
+2. Restrict access to protected resources for authenticated users only.
+
+30
+
+3. Manage user profiles containing basic information such as name and education
+level.
+4. Enable users to upload, view, and delete PDF or DOCX documents within chat
+sessions.
+5. Allow users to create, manage, and review their chat histories.
+6. Process natural language queries and retrieve semantically relevant information
+using ChromaDB.
+7. Generate AI-driven contextual responses grounded in retrieved document content
+via OpenAI’s language model.
+8. Persist conversation history, including user queries, AI responses, and document
+citations.
+9. Deliver authentication emails using structured HTML templates for clarity and
+consistency.
+3.3.2 Non-Functional Requirements
+The system must adhere to the following performance, reliability, and design standards:
+1. Maintain low latency and ensure timely responses under typical usage conditions.
+2. Secure all communications over HTTPS and encrypt sensitive data such as tokens
+and credentials.
+3. Validate inputs and implement error handling, logging, and recovery mechanisms
+to enhance reliability.
+4. Support scalability through stateless service design and efficient resource
+management.
+5. Maintain a modular TypeScript codebase with clear separation of concerns for ease
+of maintenance.
+
+6. Provide automatically generated, up-to-date API documentation using
+OpenAPI/Swagger.
+3.4 System Design
+This section presents the design philosophy, overall architecture, and specific subsystem
+designs that showcases Lernen's technical foundation.
+3.4.1 Design Philosophy and Principles
+The proposed system’s design would follow the Agile methodology and NestJS’s
+architectural principles, emphasizing modularity and long-term scalability.
+The system is guided by two core principles:
+1. Modularity: The application is structured into independent modules, allowing
+features to evolve and scale without disrupting the overall system.
+2. Iterative Improvement: Features are developed and refined in cycles, enabling
+continuous enhancement based on evolving requirements.
+3.4.2 Architecture Overview
+The proposed system would adopt a three-tier architecture consisting of the presentation
+layer, application layer, and data layer.
+
+Figure 3.1 Diagram of the three-tier architecture overview
+
+31
+
+32
+
+Figure 3.2 Sequence diagram of the RAG engine flow
+3.4.3 Authentication Architecture
+The proposed system would adopt a token-based authentication model designed for
+simplicity, scalability, and security. The system would support two authentication
+mechanisms: passwordless email sign-in using magic links and Google OAuth 2.0 for social
+login. Both methods issue JSON Web Tokens (JWTs) for maintaining stateless user sessions
+across client requests.
+The authentication process separates identity verification from authorization. Email-based
+users authenticate through a time-limited magic link sent to their inbox, while Google users
+authenticate via OAuth consent. Upon successful verification, the server issues access and
+
+33
+
+refresh tokens, which are used to securely access protected resources without storing session
+state on the server.
+
+Figure 3.3 Sequence diagram of the magic link auth
+
+This architecture enables seamless integration of multiple identity providers, reduces
+
+34
+
+password management risks, and aligns with modern authentication standards suitable for
+distributed systems.
+3.5 Technology Selection and Justification
+The proposed system will employ modern, reliable technologies selected for their scalability,
+maintainability, and suitability for AI-powered learning environments:
+1. NestJS (Backend Framework): Will be used to provide a modular and maintainable
+server architecture based on TypeScript.
+2. PostgreSQL with Drizzle ORM (Database): Will manage structured data efficiently
+while supporting type-safe querying.
+3. ChromaDB (Vector Store): Will enable semantic search and retrieval of useruploaded documents.
+4. OpenAI Models: Will provide intelligent, context-aware responses to user queries.
+5. JWT (Authentication): Will ensure secure and stateless authentication through email
+magic links and Google OAuth.
+6. Nodemailer (Email Service): Will handle passwordless login delivery through SMTP
+integration.
+7. LangChain and pdfjs-dist (Document Processing): Will be adopted for parsing and
+chunking document text for semantic indexing.
+8. Security and Validation Tools: A library like class-validator will be employed to
+ensure data integrity and protection.
+
+CHAPTER FOUR: SYSTEM IMPLEMENTATION
+
+35
+
+4.1 Introduction
+The implementation phase of this project involved translating the system design into a
+functional semantic question-answering platform. The system was developed using Next.js
+and React for the frontend, NestJS for the backend, ChromaDB for vector storage, and
+OpenAI's API for embedding generation and answer synthesis. User authentication was
+implemented through Passport.js supporting both email/password and Google OAuth, while
+the RAG pipeline enabled intelligent, context-grounded responses from user-uploaded
+documents.
+This chapter details the implementation process, including the technologies and tools used,
+the core system architecture covering document processing and the RAG pipeline, and the
+user interface design for authentication, document management, and question-answering.
+4.2 Core System Implementation
+4.2.1 Document Processing and Embedding
+The document processing pipeline handles PDF uploads, text extraction, chunking, and
+vector storage. When a user uploads a PDF file through the chat interface, the system first
+validates the file type and size (maximum 10MB). The PDF is then processed using pdfjsserverless to extract text content page by page. Each page's text is extracted by combining all
+text items into a single string.
+After extraction, the text is split into manageable chunks using LangChain's
+RecursiveCharacterTextSplitter with a chunk size of 1000 characters and an overlap of 200
+characters to preserve context at chunk boundaries. Each chunk retains metadata including
+the page number and source document name.
+
+The system generates 1536-dimensional vector embeddings for each chunk using OpenAI's
+
+36
+
+text-embedding-3-small model. These embeddings are then stored in ChromaDB, a vector
+database optimized for similarity search. Each vector entry includes metadata such as
+document ID, filename, chat ID, user ID, page number, and source document name. The
+original PDF file is uploaded to S3 cloud storage asynchronously, and the document metadata
+is saved in the PostgreSQL database.
+For retrieval efficiency, ChromaDB is configured with cosine similarity as the distance
+metric. The collection is cached in memory to avoid repeated initialization, and batch
+operations are used when adding embeddings to the vector store (maximum 300 embeddings
+per batch).
+4.2.2 RAG Pipeline and Answer Generation
+The RAG pipeline retrieves relevant context from uploaded documents and generates
+responses using a GPT model. When a user submits a question, the system first checks if
+there is conversation history beyond the recent messages stored in memory. If the
+conversation has more than four turns, the query is rewritten using GPT-4o-nano to
+incorporate relevant context from previous exchanges, making document retrieval more
+effective.
+The rewritten query is converted into a 1536-dimensional embedding vector, which is used to
+search ChromaDB for the top 4 most similar document chunks. The search is filtered by chat
+ID, user ID, and selected document IDs to ensure only relevant documents are searched. The
+retrieved chunks are formatted with their source page numbers and filenames.
+The system maintains conversation context through two mechanisms. Recent history stores
+the last four conversation turns in memory, while older conversations are compressed into
+summaries using GPT-4o-nano. Summaries are generated asynchronously every six turns to
+
+maintain context without overwhelming the model's context window. The most recent
+
+37
+
+summary is retrieved from the database and included in the prompt.
+The final prompt combines the user's education level, recent chat history, older chat summary,
+retrieved document context, and the current query. If the user is viewing a specific page in the
+PDF viewer, the page content is also included in the prompt for more contextually relevant
+responses. The prompt is sent to GPT-4.1-mini with a temperature of 1.0 for natural, varied
+responses.
+The model's response is streamed back to the frontend using Server-Sent Events (SSE). The
+streaming process uses a two-step authentication flow: first, a session is created with
+authentication, storing the request parameters in Redis cache; then, the SSE stream is initiated
+without authentication, retrieving the session data from cache. This approach allows for
+authenticated streaming without exposing tokens in the EventSource connection. The
+response is displayed incrementally to the user as chunks arrive, and once complete, the full
+conversation turn (user message and assistant response) is saved to the PostgreSQL database.
+
+4.3 User Interface Implementation
+
+38
+
+4.3.1 Authentication Interface (Sign-Up/Login)
+The authentication interface supports two sign-in methods: email magic link and Google
+OAuth. For email authentication, users enter their email address and receive a temporary
+magic link that expires in 10 minutes. When clicked, the link verifies the token and
+authenticates the user. For Google OAuth, users are redirected to Google's authorization page,
+and upon successful authentication, a callback exchanges the authorization code for user
+information.
+
+Figure 4.1 Sign up/Login page UI
+The authentication system uses JWT tokens for session management, with access tokens
+stored in HTTP-only cookies for security. Refresh tokens are also stored securely and used to
+generate new access tokens when the current one expires. New users are redirected to an
+onboarding flow where they provide their name, education level, and learning preferences
+before accessing the main application.
+
+39
+
+Figure 4.2 Onboarding page UI
+4.3.2 Document Upload and Management
+The document upload interface is integrated into the chat sidebar under a "Sources" section.
+Users can upload up to 5 PDF files per chat by clicking the "Add sources" button. Each
+uploaded document displays a checkbox for selection, the filename, a remove button, and an
+open button to view the document in the PDF viewer.
+Upload progress is shown with a loading spinner and filename during processing. The system
+validates file types (PDF only) and file sizes (maximum 10MB) before uploading.
+Successfully uploaded documents are automatically selected for use in the RAG pipeline.
+Users can select or deselect documents using checkboxes to control which sources are
+searched when asking questions.
+The sidebar also displays the user's recent chats in a "Recents" section, sorted by creation
+date. Each chat shows its title (derived from the first message or "New Chat" as default).
+Users can click on any chat to view its full conversation history. The sidebar includes a "New
+
+Chat" button at the top to start a fresh conversation and a profile menu at the bottom for
+
+40
+
+logout.
+
+Figure 4.3 Sidebar UI
+4.3.3 Question-Answering Interface
+The question-answering interface consists of a message composer at the bottom, a scrollable
+chat area in the center, and an optional PDF viewer on the right. Users type questions in a
+message composer at the bottom of the page and submit by clicking the send button or
+pressing Enter.
+
+41
+
+Figure 4.4 Chat Interface UI
+The chat area displays conversation turns with user messages right-aligned and assistant
+messages left-aligned. Assistant messages include formatted markdown with support for code
+blocks, tables, lists, and inline formatting. Below each assistant message are feedback buttons
+(thumbs up/down) and a copy button to copy the message to the clipboard.
+
+42
+
+Figure 4.5 Chat interface with conversation turns UI
+Streaming responses appear incrementally as chunks arrive from the server. If an error occurs,
+an error message is displayed with a retry button that allows users to resend their question.
+The PDF viewer opens in a side panel when users click the open button next to a document. It
+displays the document page by page with infinite scroll, showing a page indicator at the top.
+The current page content is automatically sent to the RAG pipeline when asking questions,
+providing additional context for more relevant responses.
+
+43
+
+Figure 4.6 File viewer UI
+4.4 Minimum System Requirements
+The system is split into two deployable components: the frontend web application and the
+backend API server. Each has its own set of requirements.
+Frontend (End User)
+Users access the system through a web browser with no installation required. The minimum
+requirements are:
+
+
+A modern web browser: Google Chrome 90+, Firefox 88+, Microsoft Edge 90+, or
+Safari 14+
+
+
+
+JavaScript must be enabled
+
+
+
+A stable internet connection for API communication, document uploads, and response
+streaming
+
+Backend (Deployment Environment)
+The server environment requires:
+
+
+Node.js version 18 or higher
+
+
+
+A minimum of 512MB RAM, with more recommended under concurrent load
+
+44
+
+The following external services must also be provisioned and configured before deployment:
+
+
+A PostgreSQL database instance for persistent storage of users, chats, messages, and
+documents
+
+
+
+A Redis instance for caching stream sessions and managing short-lived request state
+
+
+
+A Cloudflare R2 bucket (or any S3-compatible object store) for PDF file storage
+
+
+
+A ChromaDB instance for vector embedding storage and similarity search
+
+
+
+A valid OpenAI API key with access to the embedding and GPT model families used
+by the system
+
+4.5 Development Tools
+The system was built across two separate codebases. The tools used in each are listed below.
+Frontend Tools
+
+
+Next.js 15 with the App Router
+
+
+
+React
+
+
+
+TypeScript
+
+
+
+Tailwind CSS
+
+
+
+Radix UI
+
+
+
+react-pdf and pdfjs-dist
+
+Backend Tools
+
+
+NestJS
+
+
+
+TypeScript
+
+
+
+Drizzle ORM
+
+
+
+PostgreSQL
+
+
+
+Nodemailer
+
+
+
+pdfjs-serverless
+
+
+
+OpenAI SDK
+
+
+
+ChromaDB client
+
+
+
+AWS SDK for S3
+
+
+
+Upstash Redis
+
+
+
+LangChain (textsplitters)
+
+
+
+@nestjs/throttler
+
+CHAPTER FIVE: SUMMARY, CONCLUSION AND RECOMMENDATION
+
+45
+
+5.1 Summary
+This study set out to design and implement a semantic question-answering system that
+addresses two well-documented limitations of large language models: the tendency to
+generate unverifiable responses, and the inability to reason over content outside a model's
+training data.
+The resulting system, allows users to upload documents and query them conversationally.
+Rather than relying solely on a language model's stored knowledge, the system retrieves
+relevant content from the user's uploaded materials at query time and uses it to ground the
+model's response. This approach ensures that answers are traceable to specific source
+documents and pages.
+Beyond the core retrieval pipeline, the study also produced a fully functional application with
+user authentication, document management, conversation history, streaming responses, and
+an integrated document viewer. Conversation continuity across long sessions was also
+addressed, ensuring the system remains coherent even as dialogue history grows.
+5.2 Conclusion
+The study demonstrates that retrieval-augmented generation is a practical approach to
+building educational question-answering systems that are both accurate and verifiable. By
+grounding responses in user-provided materials, Lernen produces answers that can be
+checked against the original source, directly addressing the reliability concerns that limit the
+use of general-purpose language models in academic settings.
+The broader implementation also confirms that a dependable system of this kind requires
+considerably more than just the retrieval pipeline. Authentication, document storage,
+streaming infrastructure, and session management all represent non-trivial components that
+must work together for the system to be genuinely useful.
+
+5.3 Recommendations
+
+46
+
+Based on the experience of building and testing this system, the following improvements are
+recommended for future development:
+
+
+Multimodal document support: The current pipeline is limited to text-extractable
+PDFs. Extending support to handle scanned documents, mathematical notation,
+figures, and formats such as DOCX and PPTX would meaningfully expand what the
+system can handle, particularly for science and engineering subjects.
+
+
+
+Hybrid retrieval: Combining vector-based search with keyword-based retrieval
+methods, and adding a re-ranking step, would improve results for domain-specific
+terminology that semantic search alone sometimes misses.
+
+
+
+Adaptive learner modelling: Introducing a component that tracks explored topics,
+identifies recurring misunderstandings, and adjusts the complexity of responses
+accordingly would move the system closer to a genuine tutoring tool rather than a
+retrieval assistant.
+
+
+
+Reduced external dependency: The system currently relies on third-party APIs for
+core functionality. Migrating to locally hosted open-source alternatives would reduce
+operational costs and make the system more sustainable at institutional scale.
+
+5.4 Limitations of the Study
+Several limitations were encountered during this research that are worth acknowledging.
+The evaluation of the system was constrained by the absence of a formal user study. No
+assessment involving real students over a meaningful period was conducted. As a result, the
+system's actual impact on learning outcomes remains unmeasured.
+Document support is also restricted to text-extractable PDFs. This is a notable constraint
+given that many academic materials, particularly older textbooks and journal articles, exist
+only in scanned form and would not be processed correctly by the current pipeline.
+
+47
+
+Finally, the system's dependence on third-party API services introduced practical constraints
+during testing. Usage limits restricted the volume of queries that could be evaluated, and the
+associated costs placed a ceiling on the scale of testing. These constraints would be more
+pronounced in a multi-user deployment.
+5.5 Suggestions for Further Studies
+This work opens several directions that future research could meaningfully pursue.
+A comparative study evaluating the performance of open-source language and embedding
+models against proprietary alternatives, in the context of academic question-answering,
+would provide practical guidance for institutions weighing the cost and performance tradeoffs of deploying such systems.
+Research into retrieval pipelines capable of handling non-textual academic content, such as
+
+figures, tables, and mathematical expressions, would substantially extend the applicability of
+systems like Lernen, particularly in science and engineering disciplines where such content is
+central to the material.
+A longitudinal study measuring actual learning outcomes among students using a retrievalaugmented QA system, compared against conventional study methods, would address what is
+currently the most significant gap in the literature. Most existing work evaluates these
+systems on accuracy benchmarks alone, without examining whether they genuinely support
+learning.
+Finally, extending the architecture to support collaborative sessions, where multiple users
+contribute documents and query a shared knowledge base together, could open new
+directions for group-based and classroom-scale applications of this technology.
+
+REFERENCES
+
+48
+
+1. Karpagam, K., Madusudanan, K., & Saradha, A. (2020). Deep learning approaches for
+answer selection in question answering system for conversation agents. Ictact Journal on Soft
+Computing, 10(2), 2040-2044. https://doi.org/10.21917/ijsc.2020.0289
+2. Soares, T. (2025). Semantic-bert and semantic-fasttext model for education question
+classification. International Journal of Advances in Intelligent Informatics, 11(2), 210.
+https://doi.org/10.26555/ijain.v11i2.1955
+3. Xu, B. and Zhuge, H. (2020). The influence of semantic link network on the ability of
+question-answering system. Future Generation Computer Systems, 108, 1-14.
+https://doi.org/10.1016/j.future.2020.02.042
+4. Yuan, Y. and Chen, L. (2020). Answer selection using multi-layer semantic representation
+learning. Iop Conference Series Materials Science and Engineering, 768(7), 072009.
+https://doi.org/10.1088/1757-899x/768/7/072009
+5. Kee, X., Sng, G., Lim, D., Tung, J., Abdullah, H., & Chowdury, A. (2024). Use of a large
+language model with instruction‐tuning for reliable clinical frailty scoring. Journal of the
+American Geriatrics Society, 72(12), 3849–3854. https://doi.org/10.1111/jgs.19114
+6. Soong, D., Sridhar, S., Si, H., Wagner, J., Sá, A., Yu, C., … & Higgs, B. (2024).
+Improving accuracy of gpt-3/4 results on biomedical data using a retrieval-augmented
+language model. PLOS Digital Health, 3(8), e0000568.
+https://doi.org/10.1371/journal.pdig.0000568
+7. Swacha, J., & Gracel, M. (2025). Retrieval-Augmented Generation (RAG) Chatbots for
+Education: A Survey of Applications. Applied Sciences, 15(8), 4234.
+https://doi.org/10.3390/app15084234
+8. Kazemi, A., Mozafari, J., & Nematbakhsh, M. (2022). Persianquad: the native question
+answering dataset for the persian language. Ieee Access, 10, 26045-26057.
+https://doi.org/10.1109/access.2022.3157289 Tran, P., Nguyen, D., Tran, H., Nguyen, T., &
+
+9. Tran, T. (2023). Building a closed-domain question answering system for a low-resource
+
+49
+
+language. Acm Transactions on Asian and Low-Resource Language Information Processing,
+22(3), 1-14. https://doi.org/10.1145/3566123
+10. Voorhees, E. (2001). The trec question answering track. Natural Language Engineering,
+7(4), 361-378. https://doi.org/10.1017/s1351324901002789
+11. Widodo, S. (2023). Comparative analysis of retriever and reader for open domain
+questions answering on bps knowledge in indonesian. Proceedings of the International
+Conference on Data Science and Official Statistics, 2023(1), 337-343.
+https://doi.org/10.34123/icdsos.v2023i1.384
+12. Zhang, Y., Shen, B., & Cao, X. (2022). Learn a prior question-aware feature for machine
+reading comprehension. Frontiers in Physics, 10. https://doi.org/10.3389/fphy.2022.1085102
+13. Anggrayni, S., Baizal, Z., & Richasdy, D. (2022). Question answering system using
+semantic reasoning on ontology for the history of the sumedang larang kingdom. Building of
+Informatics Technology and Science (Bits), 4(2). https://doi.org/10.47065/bits.v4i2.1910
+14. Chen, Y., Lu, E., & Ou, T. (2021). Intelligent sparql query generation for natural
+language processing systems. Ieee Access, 9, 158638-158650.
+https://doi.org/10.1109/access.2021.3130667
+15. Suwarningsih, W. (2020). Virtual assistant upper respiratory tract infection education
+based natural language. Computer Science and Information Technologies, 2(3), 132-146.
+https://doi.org/10.11591/csit.v2i3.p132-146
+16. Wu, S., Chen, G., Shen, S., & Yan, J. (2025). Point defect detection and classification in
+mos2 scanning tunneling microscopy images: a deep learning approach. Molecules, 30(12),
+2644. https://doi.org/10.3390/molecules30122644
+17. Xu, Y., Jiang, Y., Li, R., Gao, H., Guo, J., Liu, Y., … & Wang, Y. (2020). A
+healthcare‐oriented mobile question‐and‐answering system for smart cities. Transactions on
+Emerging Telecommunications Technologies, 33(10). https://doi.org/10.1002/ett.4012
+18. Zhang, X. and Zhao, G. (2021). Taking a closed‐book examination: decoupling kb‐based
+
+inference by virtual hypothesis for answering real‐world questions. Computational
+
+50
+
+Intelligence and Neuroscience, 2021(1). https://doi.org/10.1155/2021/6689740
+19. Liu, N. F., et al. (2023). Lost in the Middle: How Language Models Use Long Contexts.
+arXiv:2307.03172.
+20. Gupta, S., Ranjan, R., & Singh, S. N. (2025). A Comprehensive Survey of RetrievalAugmented Generation (RAG): Evolution, Current Landscape and Future Directions. SSRN.
+21. Lewis, P., Perez, E., Piktus, A., Petroni, F., Karpukhin, V., Goyal, N., ... & Kiela, D.
+(2020). Retrieval-augmented generation for knowledge-intensive nlp tasks. Advances in
+Neural Information Processing Systems, 33, 9459-9474.
+22. Karpukhin, V., Oğuz, B., Min, S., Lewis, P., Wu, L., Edunov, S., ... & Yih, W. (2020).
+Dense passage retrieval for open-domain question answering. Proceedings of the 2020
+Conference on Empirical Methods in Natural Language Processing (EMNLP), 6769-6781.
+23. Asai, A., Wu, Z., Wang, Y., Sil, A., & Hajishirzi, H. (2023). Self-RAG: Learning to
+retrieve, generate, and critique through self-reflection. arXiv preprint arXiv:2310.11511.
+24. Xiong, W., Liu, J., Molybog, I., Zhang, H., Bhargava, P., Hou, R., ... & Mehdad, Y.
+(2024). Active retrieval augmented generation. arXiv preprint arXiv:2305.06983.
+25. Barnett, S., Kurniawan, S., Thudumu, S., Brannelly, Z., & Abdelrazek, M. (2024). Seven
+failure points when engineering a retrieval augmented generation system. arXiv preprint
+arXiv:2401.05856.
+26. Shuster, K., Poff, S., Chen, M., Kiela, D., & Weston, J. (2021). Retrieval augmentation
+reduces hallucination in conversation. Findings of the Association for Computational
+Linguistics: EMNLP 2021, 3784-3803.
+
+

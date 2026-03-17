@@ -1,0 +1,21 @@
+﻿1.2 STATEMENT OF THE PROBLEM
+Despite the advancements in financial technology and the rapid deployment of digital transaction platforms, the incidence of financial fraud continues to exhibit an upward trajectory. Existing traditional rule-based fraud detection mechanisms are fundamentally reactive, static, and often produce a high rate of false positives, which frustrates legitimate users and causes transaction bottlenecks. These obsolete systems struggle to recognize new, complex, and evolving patterns of fraudulent behavior in real time. Consequently, considerable financial losses are incurred before administrative teams can flag the breaches. There is a critical gap in deploying proactive, highly accurate, and adaptive mechanisms capable of continuous learning. Therefore, this study seeks to address this gap by developing an intelligent, real-time machine learning-based fraud detection system capable of evaluating transaction features instantaneously to distinguish between legitimate and fraudulent activities in FinTech applications.
+
+1.5 SCOPE OF THE STUDY
+The scope of this study encompasses the design, evaluation, and implementation of a machine learning-based fraud detection system tailored specifically for digital FinTech transactions. Geographically and operationally, the simulation and data modeling will be restricted to analyzing anonymized credit card/digital transaction datasets sourced from publicly accessible repositories (e.g., Kaggle). The study will focus primarily on the use of classification algorithms, specifically Logistic Regression, Random Forest, Support Vector Machines (SVM), and XGBoost. The developed prototype will monitor digital payment streams in real time but will be limited to a web-based testing environment built using Python and Flask, rather than being deployed onto live enterprise banking mainframes.
+
+1.6 SIGNIFICANCE OF THE STUDY
+The outcomes of this study will provide profound benefits to various stakeholders within the digital finance ecosystem:
+- For Financial Institutions and FinTech Companies: It offers a robust, automated solution that rapidly reduces financial losses and significantly lowers the operational costs associated with manual fraud reviews.
+- For Consumers: It enhances the security of their digital funds and improves user experience by minimizing false transaction declines (false positives).
+- For the Academic Community: This research contributes to the existing body of knowledge on applied artificial intelligence in cybersecurity and provides a foundational prototype that future researchers can augment with deeper neural network architectures.
+
+1.7 DEFINITION OF TERMS
+- Fraud Detection: The processes and mechanisms employed to identify and block deceptive financial transactions before they are fully processed.
+- Machine Learning (ML): A subset of Artificial Intelligence (AI) that entails the use of algorithms and statistical models enabling systems to improve their performance based on data patterns without explicit programming.
+- FinTech: Financial Technology; represents the software, applications, or technologies designed to improve and automate the delivery and use of financial services.
+- Real-Time Processing: The continuous input, processing, and output of data, yielding essentially instantaneous systemic responses.
+- False Positives: Instances where a legitimate transaction is incorrectly flagged and blocked as fraudulent by the detection system.
+
+1.8 ORGANIZATION OF THE PROJECT
+This project is systematically organized into five distinct chapters. Chapter One introduces the study, outlining the background, problem statement, objectives, scope, and significance. Chapter Two delves into the Literature Review, providing an extensive evaluation of historical contexts, existing systems, and related works in ML fraud detection. Chapter Three outlines the System Analysis and Design, detailing the methodology, proposed model architecture, flowcharts, and system requirements. Chapter Four focuses on System Implementation and Testing, encompassing technology selection, module integration, and performance evaluation. Finally, Chapter Five summarizes the findings, draws conclusions, acknowledges limitations, and provides recommendations for future endeavors.
