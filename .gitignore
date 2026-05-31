@@ -12,5 +12,3 @@ node_modules/
 *.pdf
 *.docx
 .venv/
-creditcard.csv
-*.csv
